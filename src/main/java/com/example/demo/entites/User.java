@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table
+@Table(name = "users")
 @Entity
 public class User extends BaseEntity {
 
