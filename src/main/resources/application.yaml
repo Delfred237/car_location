@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: location_car
+
+  # Configuration de la base de donnees
+  datasource:
+    url: jdbc:postgresql://localhost:5432/car_location
+    username: postgres
+    password: postgresql
+    driver-class-name: org.postgresql.Driver
+
+  # Configuration de JPA/Hibernate
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# Configuration du serveur
+server:
+  servlet:
+    context-path: /api
+  port: 8000
