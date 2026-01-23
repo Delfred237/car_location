@@ -1,8 +1,11 @@
 package com.example.demo.entites;
 
 import com.example.demo.enums.PieceType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.HashSet;
@@ -17,12 +20,33 @@ import java.util.Set;
 @Entity
 public class User extends BaseEntity {
 
+    @NotBlank(message = "Le nom complet est obligatoire")
+    @Column(name = "full_name", nullable = false)
     private String fullName;
+
+    @NotBlank(message = "L'email est obligatoire")
+    @Email(message = "Format d'email invalide")
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @NotBlank(message = "Le mot de passe est obligatoire")
+    @Column(nullable = false)
     private String password;
+
+    @Column(name = "phone_number", length = 20)
     private String phoneNumber;
+
+    @NotBlank(message = "Le document d'identité est obligatoire")
+    @Column(nullable = false)
     private String piece;
+
+    @Column(name = "piece_type", length = 20)
     private PieceType pieceType;
+
+    @Column(name = "piece_number", nullable = false)
+    private String pieceNumber; // Le numéro du document
+
+    @Column(name = "piece_file_path")
     private String pieceFilePath;
     private Set<Role> roles = new HashSet<>();
 }
