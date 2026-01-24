@@ -1,10 +1,12 @@
 package com.example.demo.entites;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
@@ -28,4 +30,9 @@ public class Agency extends BaseEntity {
 
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
+
+    @JsonIgnoreProperties("cars")
+    @OneToMany(mappedBy = "agency", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Car> cars = new ArrayList<>();
 }

@@ -1,7 +1,9 @@
 package com.example.demo.entites;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -10,10 +12,10 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Setter
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @MappedSuperclass
-public class BaseEntity implements Serializable {
+public abstract class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -21,15 +23,28 @@ public class BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
-    @Column(nullable = false)
     @CreationTimestamp
+    @Column(name = "created_date", nullable = false, updatable = false)
     protected LocalDateTime createdDate;
 
     @UpdateTimestamp
+    @Column(name = "updated_date")
     protected LocalDateTime updatedDate;
 
-    //Permet de gerer les comportements etranges d'Hibernate
-    // (Hibernate-safe equality based on identifier)
+    /**
+     * Detecte les conflits si deux utilisateurs modifient la meme entite
+     *  Leve une exception
+     *  Protege les donnees
+     */
+    @Version
+    @Column(nullable = false)
+    protected Long version;
+
+    /**
+     * Deux entités sont égales si :
+     * - elles sont de la même classe
+     * - elles ont un id non null identique
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -38,8 +53,19 @@ public class BaseEntity implements Serializable {
         return id != null && id.equals(that.id);
     }
 
+    /**
+     * HashCode stable basé sur la classe
+     * (recommandé par Hibernate)
+     */
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    /**
+     * Indique si l'entité a déjà été persistée
+     */
+    public boolean isPersisted() {
+        return id != null;
     }
 }

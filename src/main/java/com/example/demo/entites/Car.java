@@ -1,8 +1,6 @@
 package com.example.demo.entites;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -33,8 +31,14 @@ public class Car extends BaseEntity {
     @Column(length = 30)
     private String color;
 
-    @Column(name = "mileage")
-    private Integer mileage; // Kilometrage de la voiture
+    @Column(name = "mileage", nullable = false)
+    private Integer mileage = 0; // Kilometrage de la voiture
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "agency")
     private Agency agency;
 }

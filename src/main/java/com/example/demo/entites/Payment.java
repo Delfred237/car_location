@@ -19,7 +19,7 @@ public class Payment extends BaseEntity {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "payment_date", nullable = false)
+    @Column(name = "payment_date", nullable = false, updatable = false)
     private LocalDateTime paymentDate;
 
     @Enumerated(EnumType.STRING)
@@ -32,4 +32,14 @@ public class Payment extends BaseEntity {
     @Column(name = "transaction_id", unique = true)
     private String transactionId;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "reservation_id", nullable = false, updatable = false)
+    private Reservation reservation;
+
+    @PrePersist
+    protected void onCreate() {
+        if (paymentDate == null) {
+            paymentDate = LocalDateTime.now();
+        }
+    }
 }
