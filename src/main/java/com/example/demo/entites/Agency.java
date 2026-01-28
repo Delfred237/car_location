@@ -1,5 +1,6 @@
 package com.example.demo.entites;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -31,6 +32,7 @@ public class Agency extends BaseEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
+//    @JsonIgnore
     @JsonIgnoreProperties("cars")
     @OneToMany(mappedBy = "agency", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             orphanRemoval = true, fetch = FetchType.LAZY)
