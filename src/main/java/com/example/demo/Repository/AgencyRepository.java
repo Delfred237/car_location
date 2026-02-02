@@ -24,19 +24,10 @@ public interface AgencyRepository extends JpaRepository<Agency, Long> {
      */
     boolean existsByName(String name);
 
-    Optional<Agency> findByNameIgnoreCase(String name);
-
     /**
      * Recherche toutes les agences d'une ville
      * @param city le nom de la ville
      * @return liste des agences de la ville
      */
     Optional<Agency> findByCity(String city);
-
-    /**
-     * Recherche toutes les agences d'une ville (insensible à la casse)
-     * @param city le nom de la ville
-     * @return liste des agences de la ville
-     */
-    List<Agency> findByCityIgnoreCase(String city);
 }

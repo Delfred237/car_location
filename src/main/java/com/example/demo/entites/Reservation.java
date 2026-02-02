@@ -30,7 +30,7 @@ public class Reservation extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private ReservationStatus status;
+    private ReservationStatus status = ReservationStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false, updatable = false)

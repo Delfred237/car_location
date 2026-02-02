@@ -1,6 +1,7 @@
 package com.example.demo.mapper;
 
 import com.example.demo.dto.request.CarRequestDTO;
+import com.example.demo.dto.response.CarResponseDTO;
 import com.example.demo.entites.Car;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,10 +26,10 @@ public interface CarMapper {
      * On mappe les infos de Category et Agency
      */
     @Mapping(target = "categoryId", source = "category.id")
-    @Mapping(target = "name", source = "category.name")
+    @Mapping(target = "categoryName", source = "category.name")
     @Mapping(target = "agencyId", source = "agency.id")
     @Mapping(target = "agencyName", source = "agency.name")
-    CarRequestDTO toDTO(Car car);
+    CarResponseDTO toDTO(Car car);
 
     /**
      * Met à jour une entité Car existante

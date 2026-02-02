@@ -1,11 +1,5 @@
 package com.example.demo.dto.request;
 
-import com.example.demo.entites.Agency;
-import com.example.demo.entites.Category;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,17 +20,17 @@ public class CarRequestDTO {
 
     @NotBlank(message = "La plaque d'immatriculation est obligatoire")
     @Size(min = 5, max = 20, message = "La plaque doit contenir entre 5 et 20 caractères")
-    private String registration;
+    private String licensePlate;
 
     @Min(value = 1900, message = "L'année de fabrication doit être supérieure à 1900")
     @Max(value = 2030, message = "L'année de fabrication ne peut pas dépasser 2030")
     private Integer yearOfManufacture;
 
-    @Column(length = 30)
+    @Size(max = 30, message = "La couleur ne peut pas dépasser 30 caractères")
     private String color;
 
     @Min(value = 0, message = "Le kilométrage ne peut pas être négatif")
-    private Integer mileage = 0; // Kilometrage de la voiture
+    private Integer mileage;
 
     @NotNull(message = "La catégorie est obligatoire")
     private Long categoryId;

@@ -37,8 +37,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public List<CategoryResponseDTO> getAll() {
         return categoryRepository.findAll().stream()
                 .map(categoryMapper::toDTO)
@@ -46,6 +46,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponseDTO getById(Long id) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("category", "id", id));
@@ -53,14 +54,15 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CategoryResponseDTO getByName(String name) {
         Category category = categoryRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("category", "name", name));
         return categoryMapper.toDTO(category);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public CategoryResponseDTO update(Long id, CategoryRequestDTO categoryRequestDTO) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("category", "id", id));

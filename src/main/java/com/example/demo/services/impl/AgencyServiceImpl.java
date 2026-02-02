@@ -10,6 +10,7 @@ import com.example.demo.mapper.AgencyMapper;
 import com.example.demo.services.AgencyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ public class AgencyServiceImpl implements AgencyService {
 
     private final AgencyRepository agencyRepository;
     private final AgencyMapper agencyMapper;
+
 
     @Override
     public AgencyResponseDTO createAgency(AgencyRequestDTO agencyRequestDTO) {
@@ -36,6 +38,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AgencyResponseDTO> getAll() {
         return agencyRepository.findAll().stream()
                 .map(agencyMapper::toDto)
@@ -43,6 +46,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<AgencyResponseDTO> getById(Long id) {
         Agency agency = agencyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "id", id));
@@ -50,6 +54,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<AgencyResponseDTO> getByName(String name) {
         Agency agency = agencyRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "name", name));
@@ -57,6 +62,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<AgencyResponseDTO> getByCity(String city) {
         Agency agency = agencyRepository.findByCity(city)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "city", city));
@@ -64,6 +70,7 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
+    @Transactional
     public AgencyResponseDTO updateAgency(Long id, AgencyRequestDTO agencyRequestDTO) {
         Agency agency = agencyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "id", id));

@@ -24,7 +24,7 @@ public class Payment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private PaymentStatus status;
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     @Column(name = "payment_method", length = 50)
     private String paymentMethod; // CARD, CASH, TRANSFER

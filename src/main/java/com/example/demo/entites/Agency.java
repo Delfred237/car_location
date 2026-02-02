@@ -32,7 +32,6 @@ public class Agency extends BaseEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-//    @JsonIgnore
     @JsonIgnoreProperties("cars")
     @OneToMany(mappedBy = "agency", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
             orphanRemoval = true, fetch = FetchType.LAZY)

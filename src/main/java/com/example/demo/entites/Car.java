@@ -23,7 +23,7 @@ public class Car extends BaseEntity {
 
     @NotBlank(message = "La plaque d'immatriculation est obligatoire")
     @Column(name = "license_plate", nullable = false, unique = true, length = 20)
-    private String registration;
+    private String licensePlate;
 
     @Column(name = "year_of_manufacture")
     private Integer yearOfManufacture;

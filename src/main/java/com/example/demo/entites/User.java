@@ -37,18 +37,8 @@ public class User extends BaseEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @NotBlank(message = "Le document d'identité est obligatoire")
-    @Column(nullable = false)
-    private String piece;
-
-    @Column(name = "piece_type", length = 20)
-    private PieceType pieceType;
-
-    @Column(name = "piece_number", nullable = false)
-    private String pieceNumber; // Le numéro du document
-
-    @Column(name = "piece_file_path")
-    private String pieceFilePath;
+    @Column(name = "image_path")
+    private String imagePath;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -57,8 +47,4 @@ public class User extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
-
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Reservation> reservations = new ArrayList<>();
 }
