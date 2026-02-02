@@ -1,6 +1,7 @@
 package com.example.demo.mapper;
 
 import com.example.demo.dto.request.AgencyRequestDTO;
+import com.example.demo.dto.response.AgencyResponseDTO;
 import com.example.demo.entites.Agency;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +15,7 @@ public interface AgencyMapper {
     @Mapping(target = "updatedDate", ignore = true)
     Agency toEntity(AgencyRequestDTO dto);
 
-    AgencyRequestDTO toDto(Agency agency);
+    AgencyResponseDTO toDto(Agency agency);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
