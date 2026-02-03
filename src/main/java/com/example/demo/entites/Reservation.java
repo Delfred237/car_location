@@ -7,8 +7,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Builder
 @AllArgsConstructor
@@ -17,7 +15,7 @@ import java.util.Set;
 @Getter
 @Table(name = "reservations")
 @Entity
-public class Reservation extends BaseEntity{
+public class Reservation extends BaseEntity {
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
@@ -32,17 +30,13 @@ public class Reservation extends BaseEntity{
     @Column(nullable = false, length = 20)
     private ReservationStatus status = ReservationStatus.PENDING;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "reservation_car",
-            joinColumns = @JoinColumn(name = "car_id"),
-            inverseJoinColumns = @JoinColumn(name = "reservation_id")
-    )
-    private Set<Car> car = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id", nullable = false)
+    private Car car;
 
     // Validation métier
     @AssertTrue(message = "La date de fin doit être après la date de début")

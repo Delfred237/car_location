@@ -61,6 +61,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         Reservation reservation = reservationMapper.toEntity(requestDTO);
         reservation.setUser(user);
+        reservation.setCar(car);
         reservation.setStatus(ReservationStatus.PENDING);
 
         // Calculer le prix total

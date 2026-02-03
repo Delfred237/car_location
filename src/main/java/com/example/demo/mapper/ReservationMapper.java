@@ -29,9 +29,9 @@ public interface ReservationMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "userFullName", source = "user.fullName")
     @Mapping(target = "userEmail", source = "user.email")
-//    @Mapping(target = "carId", source = "car.id")
-//    @Mapping(target = "carBrand", source = "car.brand")
-//    @Mapping(target = "carModel", source = "car.model")
-//    @Mapping(target = "carLicensePlate", source = "car.licensePlate")
+    @Mapping(target = "carId", source = "car.id")
+    @Mapping(target = "carBrand", source = "car.brand")
+    @Mapping(target = "carModel", source = "car.model")
+    @Mapping(target = "carLicensePlate", source = "car.licensePlate")
     ReservationResponseDTO toDTO(Reservation reservation);
 }

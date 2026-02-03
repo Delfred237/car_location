@@ -1,6 +1,5 @@
 package com.example.demo.entites;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -22,18 +21,18 @@ public class Category extends BaseEntity {
 
     @NotBlank(message = "Le nom de la catégorie est obligatoire")
     @Column(nullable = false, unique = true, length = 50)
-    private String name;
+    private String name; // SUV, Berline, Citadine, Luxe
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @NotNull(message = "Le prix journalier est obligatoire")
     @Column(name = "price_per_day", nullable = false, precision = 10, scale = 2)
-    private BigDecimal pricePerDay;
+    private BigDecimal pricePerDay; // Prix journalier de location
 
-//    @JsonIgnore -> A remettre plus tard si on ne veut plus afficher ce champ dans le Json
-    @JsonIgnoreProperties("cars") // Ignore le champ cars dans les objets enfants cars
-    @OneToMany(mappedBy = "category", cascade = {CascadeType.PERSIST, CascadeType.MERGE},
-                orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("cars")
+    @OneToMany(mappedBy = "category",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Car> cars = new ArrayList<>();
 }
