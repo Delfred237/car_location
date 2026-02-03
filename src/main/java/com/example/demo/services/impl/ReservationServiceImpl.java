@@ -38,6 +38,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserRepository userRepository;
     private final CarRepository carRepository;
     private final ReservationMapper reservationMapper;
+    private final EmailService emailService;
 
 
     @Override
@@ -71,6 +72,9 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setTotalPrice(totalPrice);
 
         Reservation savedReservation = reservationRepository.save(reservation);
+
+        // Envoie de l'eamil de confirmation
+        emailService.sendReservationConfirmation(savedReservation);
 
         return reservationMapper.toDTO(savedReservation);
     }
@@ -183,6 +187,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         reservation.setStatus(ReservationStatus.CANCELLED);
         Reservation cancelledReservation = reservationRepository.save(reservation);
+
+        // Envoie de l'email d'annulation
+        emailService.sendReservationCancellation(cancelledReservation);
 
         return reservationMapper.toDTO(cancelledReservation);
     }

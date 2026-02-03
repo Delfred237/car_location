@@ -4,6 +4,7 @@ import com.example.demo.Repository.PaymentRepository;
 import com.example.demo.Repository.ReservationRepository;
 import com.example.demo.dto.request.PaymentRequestDTO;
 import com.example.demo.dto.response.PaymentResponseDTO;
+import com.example.demo.email.EmailService;
 import com.example.demo.entites.Payment;
 import com.example.demo.entites.Reservation;
 import com.example.demo.enums.PaymentStatus;
@@ -27,6 +28,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
     private final PaymentMapper paymentMapper;
+    private final EmailService emailService;
 
 
     @Override
@@ -127,6 +129,9 @@ public class PaymentServiceImpl implements PaymentService {
         if (paymentSuccessful) {
             payment.setStatus(PaymentStatus.COMPLETED);
             payment.setTransactionId(generateTransactionId());
+
+            // Envoie de l'email de confirmation de paiement
+            emailService.sendPaymentConfirmation(payment.getReservation(), payment.getTransactionId());
         } else {
             payment.setStatus(PaymentStatus.FAILED);
         }
