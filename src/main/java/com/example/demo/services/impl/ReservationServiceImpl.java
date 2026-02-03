@@ -5,6 +5,7 @@ import com.example.demo.Repository.ReservationRepository;
 import com.example.demo.Repository.UserRepository;
 import com.example.demo.dto.request.ReservationRequestDTO;
 import com.example.demo.dto.response.ReservationResponseDTO;
+import com.example.demo.email.EmailService;
 import com.example.demo.entites.Car;
 import com.example.demo.entites.Category;
 import com.example.demo.entites.Reservation;
