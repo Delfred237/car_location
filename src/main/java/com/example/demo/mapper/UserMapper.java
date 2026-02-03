@@ -4,6 +4,7 @@ import com.example.demo.dto.request.UserRequestDTO;
 import com.example.demo.dto.response.UserResponseDTO;
 import com.example.demo.entites.Role;
 import com.example.demo.entites.User;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
@@ -11,6 +12,7 @@ import org.mapstruct.Named;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Mapper(config = MapperConfig.class)
 public interface UserMapper {
 
     /**

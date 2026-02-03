@@ -63,10 +63,12 @@ public class AgencyServiceImpl implements AgencyService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<AgencyResponseDTO> getByCity(String city) {
+    public List<AgencyResponseDTO> getByCity(String city) {
         Agency agency = agencyRepository.findByCity(city)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "city", city));
-        return Optional.ofNullable(agencyMapper.toDto(agency));
+        return agencyRepository.findAll().stream()
+                .map(agencyMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

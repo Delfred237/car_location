@@ -16,7 +16,7 @@ public interface AgencyService {
 
     Optional<AgencyResponseDTO> getByName(String name);
 
-    Optional<AgencyResponseDTO> getByCity(String city);
+    List<AgencyResponseDTO> getByCity(String city);
 
     AgencyResponseDTO updateAgency(Long id, AgencyRequestDTO agencyRequestDTO);
 
