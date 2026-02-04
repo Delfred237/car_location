@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class AgencyServiceImpl implements AgencyService {
@@ -25,6 +26,7 @@ public class AgencyServiceImpl implements AgencyService {
 
 
     @Override
+    @Transactional
     public AgencyResponseDTO createAgency(AgencyRequestDTO agencyRequestDTO) {
         // Verifier si l'agence existe deja avec ce nom
         if (agencyRepository.existsByName(agencyRequestDTO.getName())) {
@@ -38,7 +40,6 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<AgencyResponseDTO> getAll() {
         return agencyRepository.findAll().stream()
                 .map(agencyMapper::toDto)
@@ -54,7 +55,6 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<AgencyResponseDTO> getByName(String name) {
         Agency agency = agencyRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "name", name));
@@ -62,7 +62,6 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<AgencyResponseDTO> getByCity(String city) {
         Agency agency = agencyRepository.findByCity(city)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "city", city));

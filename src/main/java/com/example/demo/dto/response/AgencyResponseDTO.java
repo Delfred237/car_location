@@ -16,5 +16,5 @@ public class AgencyResponseDTO {
     private String city;
     private String address;
     private String phoneNumber;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdDate;
 }

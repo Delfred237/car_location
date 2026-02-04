@@ -11,14 +11,12 @@ import org.mapstruct.MappingTarget;
 public interface AgencyMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     Agency toEntity(AgencyRequestDTO dto);
 
     AgencyResponseDTO toDto(Agency agency);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     Agency updateEnity(@MappingTarget Agency agency, AgencyRequestDTO dto);
 }

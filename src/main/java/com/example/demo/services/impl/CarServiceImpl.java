@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class CarServiceImpl implements CarService {
@@ -63,7 +64,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CarResponseDTO getById(Long id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car", "id", id));
@@ -72,7 +72,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CarResponseDTO> getAll() {
         return carRepository.findAll().stream()
                 .map(carMapper::toDTO)
@@ -80,7 +79,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CarResponseDTO> getByCategory(Long categoryId) {
         // Vérifier que la catégorie existe
         if (!categoryRepository.existsById(categoryId)) {
@@ -93,7 +91,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CarResponseDTO> getByAgency(Long agencyId) {
         // Vérifier que l'agence existe
         if (!agencyRepository.existsById(agencyId)) {
@@ -106,7 +103,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CarResponseDTO> getAvailableCars(LocalDate startDate, LocalDate endDate) {
         return carRepository.findAvailableCars(startDate, endDate).stream()
                 .map(carMapper::toDTO)
@@ -114,7 +110,6 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CarResponseDTO> getAvailableCarsByCategory(Long categoryId, LocalDate startDate, LocalDate endDate) {
         // Vérifier que la catégorie existe
         if (!categoryRepository.existsById(categoryId)) {
@@ -159,6 +154,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car", "id", id));

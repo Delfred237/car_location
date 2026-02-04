@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -42,6 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 
     @Override
+    @Transactional
     public ReservationResponseDTO create(ReservationRequestDTO requestDTO, Long userId) {
         // Récupérer l'utilisateur
         User user = userRepository.findById(userId)
@@ -80,7 +82,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ReservationResponseDTO getById(Long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", id));
@@ -89,7 +90,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getAll() {
         return reservationRepository.findAll().stream()
                 .map(reservationMapper::toDTO)
@@ -97,7 +97,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getByUser(Long userId) {
         // Vérifier que l'utilisateur existe
         if (!userRepository.existsById(userId)) {
@@ -110,7 +109,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getByCar(Long carId) {
         // Vérifier que la voiture existe
         if (!carRepository.existsById(carId)) {
@@ -123,7 +121,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getByStatus(ReservationStatus status) {
         return reservationRepository.findByStatus(status).stream()
                 .map(reservationMapper::toDTO)
@@ -131,7 +128,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getUpcomingReservationsByUser(Long userId) {
         // Vérifier que l'utilisateur existe
         if (!userRepository.existsById(userId)) {
@@ -145,7 +141,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> getReservationHistoryByUser(Long userId) {
         // Vérifier que l'utilisateur existe
         if (!userRepository.existsById(userId)) {
@@ -195,6 +190,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", id));

@@ -11,7 +11,6 @@ import org.mapstruct.MappingTarget;
 public interface CategoryMapper {
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
     Category toEntity(CategoryRequestDTO dto);
 

@@ -56,11 +56,11 @@ public class CategoryController {
     }
 
     /**
-     * Mettre à jour une agence
+     * Mettre à jour une categorie
      * PUT /api/agencies/{id}
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponseDTO> updateAgency(
+    public ResponseEntity<CategoryResponseDTO> updateCategory(
             @PathVariable Long id,
             @Valid @RequestBody CategoryRequestDTO requestDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.update(id, requestDTO));

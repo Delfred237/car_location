@@ -16,5 +16,5 @@ public class CategoryResponseDTO {
     private String name;
     private String description;
     private BigDecimal pricePerDay;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdDate;
 }

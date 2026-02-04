@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/agencies")
 @RequiredArgsConstructor
@@ -36,6 +37,15 @@ public class AgencyController {
     @GetMapping
     public ResponseEntity<List<AgencyResponseDTO>> getAllAgencies() {
         return ResponseEntity.status(HttpStatus.OK).body(agencyService.getAll());
+    }
+
+    /**
+     * Rechercher une agence par id
+     * GET /api/agencies/id/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<AgencyResponseDTO>> getAgencyById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(agencyService.getById(id));
     }
 
     /**

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Transactional(readOnly = true)
 @AllArgsConstructor
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -32,6 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     @Override
+    @Transactional
     public PaymentResponseDTO create(PaymentRequestDTO requestDTO) {
         // Récupérer la réservation
         Reservation reservation = reservationRepository.findById(requestDTO.getReservationId())
@@ -53,7 +55,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public PaymentResponseDTO getById(Long id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", "id", id));
@@ -62,7 +63,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PaymentResponseDTO> getAll() {
         return paymentRepository.findAll().stream()
                 .map(paymentMapper::toDTO)
@@ -70,7 +70,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PaymentResponseDTO> getByReservation(Long reservationId) {
         // Vérifier que la réservation existe
         if (!reservationRepository.existsById(reservationId)) {
@@ -83,7 +82,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PaymentResponseDTO> getByStatus(PaymentStatus status) {
         return paymentRepository.findByStatus(status).stream()
                 .map(paymentMapper::toDTO)
@@ -91,7 +89,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<PaymentResponseDTO> getPaymentsBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
         return paymentRepository.findPaymentsBetweenDates(startDate, endDate).stream()
                 .map(paymentMapper::toDTO)
