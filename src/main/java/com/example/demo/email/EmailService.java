@@ -1,6 +1,7 @@
 package com.example.demo.email;
 
 import com.example.demo.entites.Reservation;
+import com.example.demo.entites.User;
 
 public interface EmailService {
 
@@ -16,4 +17,11 @@ public interface EmailService {
     void sendReservationReminder(Reservation reservation);
 
     void sendPaymentConfirmation(Reservation reservation, String transactionId);
+
+    // Emails liés à l'authentification
+    void sendAccountVerification(User user, String verificationToken);
+
+    void sendPasswordResetEmail(User user, String resetToken);
+
+    void sendWelcomeEmail(User user);
 }

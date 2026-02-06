@@ -1,6 +1,7 @@
 package com.example.demo.email;
 
 import com.example.demo.entites.Reservation;
+import com.example.demo.entites.User;
 import com.example.demo.exceptions.BusinessException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -20,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class EmailServiceImpl implements EmailService{
@@ -33,8 +35,8 @@ public class EmailServiceImpl implements EmailService{
     @Value("${app.mail.fromName}")
     private String fromName;
 
-//    @Value("${app.base.url}")
-//    private String baseUrl;
+    @Value("${app.base.url}")
+    private String baseUrl;
 
 
     @Override
@@ -161,6 +163,66 @@ public class EmailServiceImpl implements EmailService{
                 .recipient(reservation.getUser().getEmail())
                 .subject("Confirmation de paiement - Réservation #" + reservation.getId())
                 .templateName("/payment-confirmation")
+                .templateModel(model)
+                .build();
+
+        sendHtmlEmail(emailDetails);
+    }
+
+    @Override
+    public void sendAccountVerification(User user, String verificationToken) {
+        log.info("Envoi de l'email de vérification de compte à : {}", user.getEmail());
+
+        String verificationUrl = baseUrl + "/api/auth/verify?token=" + verificationToken;
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("userName", user.getFullName());
+        model.put("verificationUrl", verificationUrl);
+        model.put("expirationTime", "24 heures");
+
+        EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
+                .recipient(user.getEmail())
+                .subject("Vérification de votre compte Car Rental")
+                .templateName("email/account-verification")
+                .templateModel(model)
+                .build();
+
+        sendHtmlEmail(emailDetails);
+    }
+
+    @Override
+    public void sendPasswordResetEmail(User user, String resetToken) {
+        log.info("Envoi de l'email de réinitialisation de mot de passe à : {}", user.getEmail());
+
+        String resetUrl = baseUrl + "/api/auth/reset-password?token=" + resetToken;
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("userName", user.getFullName());
+        model.put("resetUrl", resetUrl);
+        model.put("expirationTime", "1 heure");
+
+        EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
+                .recipient(user.getEmail())
+                .subject("Réinitialisation de votre mot de passe")
+                .templateName("email/password-reset")
+                .templateModel(model)
+                .build();
+
+        sendHtmlEmail(emailDetails);
+    }
+
+    @Override
+    public void sendWelcomeEmail(User user) {
+        log.info("Envoi de l'email de bienvenue à : {}", user.getEmail());
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("userName", user.getFullName());
+        model.put("loginUrl", baseUrl + "/login");
+
+        EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
+                .recipient(user.getEmail())
+                .subject("Bienvenue chez Car Rental !")
+                .templateName("email/welcome")
                 .templateModel(model)
                 .build();
 
