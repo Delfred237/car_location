@@ -35,7 +35,7 @@ public class StripePaymentController {
             @Valid @RequestBody StripePaymentRequestDTO requestDTO) {
         System.out.println(String.format("POST /api/stripe/create-checkout-session - Réservation ID : {}", requestDTO.getReservationId()));
         StripePaymentResponseDTO response = stripePaymentService.createCheckoutSession(requestDTO);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -47,7 +47,7 @@ public class StripePaymentController {
             @Valid @RequestBody StripePaymentRequestDTO requestDTO) {
         System.out.println(String.format("POST /api/stripe/create-payment-intent - Réservation ID : {}", requestDTO.getReservationId()));
         StripePaymentResponseDTO response = stripePaymentService.createPaymentIntent(requestDTO);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -74,7 +74,7 @@ public class StripePaymentController {
         // Traiter l'événement
         stripePaymentService.handleWebhookEvent(event);
 
-        return ResponseEntity.ok("Webhook received");
+        return ResponseEntity.status(HttpStatus.OK).body("Webhook received");
     }
 
     /**
@@ -85,7 +85,7 @@ public class StripePaymentController {
     public ResponseEntity<Void> cancelPayment(@PathVariable String paymentIntentId) {
         System.out.println(String.format("POST /api/stripe/cancel/{} - Annulation du paiement", paymentIntentId));
         stripePaymentService.cancelPayment(paymentIntentId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -98,7 +98,7 @@ public class StripePaymentController {
             @RequestParam BigDecimal amount) {
         System.out.println(String.format("POST /api/stripe/refund/{} - Montant : {}", paymentIntentId, amount));
         stripePaymentService.refundPayment(paymentIntentId, amount);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -109,6 +109,6 @@ public class StripePaymentController {
     public ResponseEntity<String> getPaymentStatus(@PathVariable String paymentIntentId) {
         System.out.println(String.format("GET /api/stripe/status/{}", paymentIntentId));
         String status = stripePaymentService.getPaymentStatus(paymentIntentId);
-        return ResponseEntity.ok(status);
+        return ResponseEntity.status(HttpStatus.OK).body(status);
     }
 }
