@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
-@RequestMapping("/payment")
+@RequestMapping("/payments")
 @RequiredArgsConstructor
 @RestController
 public class PaymentController {

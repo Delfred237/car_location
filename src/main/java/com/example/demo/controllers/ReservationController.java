@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@RequestMapping("/reservation")
+@RequestMapping("/reservations")
 @RequiredArgsConstructor
 @RestController
 public class ReservationController {
