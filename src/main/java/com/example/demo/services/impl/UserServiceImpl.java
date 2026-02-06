@@ -14,6 +14,7 @@ import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.services.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(readOnly = true)
 @AllArgsConstructor
 @Service
@@ -35,6 +37,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO create(UserRequestDTO userRequestDTO) {
+        log.info("Création d'un nouvel utilisateur : {}", userRequestDTO.getEmail());
+
         // Vérifier si l'email existe déjà
         if (userRepository.existsByEmail(userRequestDTO.getEmail())) {
             throw new ResourceAlreadyExistsException("User", "email", userRequestDTO.getEmail());
@@ -52,11 +56,14 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
 
+        log.info("Utilisateur créé avec succès : ID {}", savedUser.getId());
         return userMapper.toDTO(savedUser);
     }
 
     @Override
     public UserResponseDTO getById(Long id) {
+        log.info("Recherche de l'utilisateur avec ID : {}", id);
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
@@ -65,6 +72,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO getByEmail(String email) {
+        log.info("Recherche de l'utilisateur avec email : {}", email);
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
@@ -73,6 +82,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> getAll() {
+        log.info("Récupération de tous les utilisateurs");
+
         return userRepository.findAll().stream()
                 .map(userMapper::toDTO)
                 .collect(Collectors.toList());
@@ -81,6 +92,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO update(Long id, UserRequestDTO requestDTO) {
+        log.info("Mise à jour de l'utilisateur ID : {}", id);
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
@@ -94,12 +107,15 @@ public class UserServiceImpl implements UserService {
 
         User updatedUser = userRepository.save(user);
 
+        log.info("Utilisateur mis à jour avec succès : ID {}", updatedUser.getId());
         return userMapper.toDTO(updatedUser);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        log.info("Suppression de l'utilisateur ID : {}", id);
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
 
@@ -114,6 +130,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void assignRoleToUser(Long userId, String roleName) {
+        log.info("Attribution du rôle {} à l'utilisateur ID : {}", roleName, userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
@@ -129,11 +147,15 @@ public class UserServiceImpl implements UserService {
 
         user.getRoles().add(role);
         userRepository.save(user);
+
+        log.info("Rôle {} attribué avec succès à l'utilisateur ID : {}", roleName, userId);
     }
 
     @Override
     @Transactional
     public void removeRoleFromUser(Long userId, String roleName) {
+        log.info("Retrait du rôle {} de l'utilisateur ID : {}", roleName, userId);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
@@ -149,5 +171,7 @@ public class UserServiceImpl implements UserService {
 
         user.getRoles().remove(role);
         userRepository.save(user);
+
+        log.info("Rôle {} retiré avec succès de l'utilisateur ID : {}", roleName, userId);
     }
 }

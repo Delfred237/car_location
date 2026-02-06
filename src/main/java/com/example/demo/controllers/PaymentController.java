@@ -6,6 +6,7 @@ import com.example.demo.enums.PaymentStatus;
 import com.example.demo.services.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RequestMapping("/payment")
 @RequiredArgsConstructor
 @RestController
@@ -28,7 +30,7 @@ public class PaymentController {
      */
     @PostMapping
     public ResponseEntity<PaymentResponseDTO> createPayment(@Valid @RequestBody PaymentRequestDTO requestDTO) {
-        System.out.println(String.format("POST /api/payments - Création d'un paiement pour la réservation ID : {}", requestDTO.getReservationId()));
+        log.info("POST /api/payments - Création d'un paiement pour la réservation ID : {}", requestDTO.getReservationId());
         PaymentResponseDTO response = paymentService.create(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -39,7 +41,7 @@ public class PaymentController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<PaymentResponseDTO> getPaymentById(@PathVariable Long id) {
-        System.out.println(String.format("GET /api/payments/{} - Récupération du paiement", id));
+        log.info("GET /api/payments/{} - Récupération du paiement", id);
         PaymentResponseDTO response = paymentService.getById(id);
         return ResponseEntity.ok(response);
     }
@@ -50,7 +52,7 @@ public class PaymentController {
      */
     @GetMapping
     public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
-        System.out.println("GET /api/payments - Récupération de tous les paiements");
+        log.info("GET /api/payments - Récupération de tous les paiements");
         List<PaymentResponseDTO> response = paymentService.getAll();
         return ResponseEntity.ok(response);
     }
@@ -61,7 +63,7 @@ public class PaymentController {
      */
     @GetMapping("/reservation/{reservationId}")
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByReservation(@PathVariable Long reservationId) {
-        System.out.println(String.format("GET /api/payments/reservation/{} - Paiements de la réservation", reservationId));
+        log.info("GET /api/payments/reservation/{} - Paiements de la réservation", reservationId);
         List<PaymentResponseDTO> response = paymentService.getByReservation(reservationId);
         return ResponseEntity.ok(response);
     }
@@ -72,7 +74,7 @@ public class PaymentController {
      */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByStatus(@PathVariable PaymentStatus status) {
-        System.out.println(String.format("GET /api/payments/status/{} - Paiements par statut", status));
+        log.info("GET /api/payments/status/{} - Paiements par statut", status);
         List<PaymentResponseDTO> response = paymentService.getByStatus(status);
         return ResponseEntity.ok(response);
     }
@@ -85,7 +87,7 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsBetweenDates(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        System.out.println(String.format("GET /api/payments/dates?start={}&end={}", start, end));
+        log.info("GET /api/payments/dates?start={}&end={}", start, end);
         List<PaymentResponseDTO> response = paymentService.getPaymentsBetweenDates(start, end);
         return ResponseEntity.ok(response);
     }
@@ -96,7 +98,7 @@ public class PaymentController {
      */
     @GetMapping("/reservation/{reservationId}/total")
     public ResponseEntity<Double> getTotalPaidAmount(@PathVariable Long reservationId) {
-        System.out.println(String.format("GET /api/payments/reservation/{}/total - Calcul du montant total payé", reservationId));
+        log.info("GET /api/payments/reservation/{}/total - Calcul du montant total payé", reservationId);
         Double totalAmount = paymentService.getTotalPaidAmount(reservationId);
         return ResponseEntity.ok(totalAmount);
     }
@@ -107,7 +109,7 @@ public class PaymentController {
      */
     @GetMapping("/reservation/{reservationId}/has-completed")
     public ResponseEntity<Boolean> hasCompletedPayment(@PathVariable Long reservationId) {
-        System.out.println(String.format("GET /api/payments/reservation/{}/has-completed", reservationId));
+        log.info("GET /api/payments/reservation/{}/has-completed", reservationId);
         Boolean hasCompleted = paymentService.hasCompletedPayment(reservationId);
         return ResponseEntity.ok(hasCompleted);
     }
@@ -118,7 +120,7 @@ public class PaymentController {
      */
     @PostMapping("/{id}/process")
     public ResponseEntity<PaymentResponseDTO> processPayment(@PathVariable Long id) {
-        System.out.println(String.format("POST /api/payments/{}/process - Traitement du paiement", id));
+        log.info("POST /api/payments/{}/process - Traitement du paiement", id);
         PaymentResponseDTO response = paymentService.processPayment(id);
         return ResponseEntity.ok(response);
     }
@@ -131,7 +133,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponseDTO> updatePaymentStatus(
             @PathVariable Long id,
             @RequestParam PaymentStatus newStatus) {
-        System.out.println(String.format("PATCH /api/payments/{}/status?newStatus={}", id, newStatus));
+        log.info("PATCH /api/payments/{}/status?newStatus={}", id, newStatus);
         PaymentResponseDTO response = paymentService.updateStatus(id, newStatus);
         return ResponseEntity.ok(response);
     }
@@ -142,7 +144,7 @@ public class PaymentController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
-        System.out.println(String.format("DELETE /api/payments/{} - Suppression du paiement", id));
+        log.info("DELETE /api/payments/{} - Suppression du paiement", id);
         paymentService.delete(id);
         return ResponseEntity.noContent().build();
     }

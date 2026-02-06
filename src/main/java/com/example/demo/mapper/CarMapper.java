@@ -3,9 +3,7 @@ package com.example.demo.mapper;
 import com.example.demo.dto.request.CarRequestDTO;
 import com.example.demo.dto.response.CarResponseDTO;
 import com.example.demo.entites.Car;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 @Mapper(config = MapperConfig.class)
 public interface CarMapper {
@@ -39,5 +37,6 @@ public interface CarMapper {
     @Mapping(target = "agency", ignore = true)
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "updatedDate", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(@MappingTarget Car car, CarRequestDTO dto);
 }

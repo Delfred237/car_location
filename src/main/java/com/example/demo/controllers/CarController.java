@@ -5,6 +5,7 @@ import com.example.demo.dto.response.CarResponseDTO;
 import com.example.demo.services.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @RequestMapping("/cars")
 @RequiredArgsConstructor
 @RestController
@@ -27,6 +29,7 @@ public class CarController {
      */
     @PostMapping
     public ResponseEntity<CarResponseDTO> createCar(@Valid @RequestBody CarRequestDTO requestDTO) {
+        log.info("POST /api/cars - Création d'une voiture : {}", requestDTO.getLicensePlate());
         return ResponseEntity.status(HttpStatus.CREATED).body(carService.create(requestDTO));
     }
 
@@ -36,6 +39,7 @@ public class CarController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CarResponseDTO> getCarById(@PathVariable Long id) {
+        log.info("GET /api/cars/{} - Récupération de la voiture", id);
         return ResponseEntity.status(HttpStatus.OK).body(carService.getById(id));
     }
 
@@ -45,6 +49,7 @@ public class CarController {
      */
     @GetMapping
     public ResponseEntity<List<CarResponseDTO>> getAllCars() {
+        log.info("GET /api/cars - Récupération de toutes les voitures");
         return ResponseEntity.status(HttpStatus.OK).body(carService.getAll());
     }
 
@@ -54,6 +59,7 @@ public class CarController {
      */
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<CarResponseDTO>> getCarsByCategory(@PathVariable Long categoryId) {
+        log.info("GET /api/cars/category/{} - Recherche par catégorie", categoryId);
         return ResponseEntity.status(HttpStatus.OK).body(carService.getByCategory(categoryId));
     }
 
@@ -63,6 +69,7 @@ public class CarController {
      */
     @GetMapping("/agency/{agencyId}")
     public ResponseEntity<List<CarResponseDTO>> getCarsByAgency(@PathVariable Long agencyId) {
+        log.info("GET /api/cars/agency/{} - Recherche par agence", agencyId);
         return ResponseEntity.status(HttpStatus.OK).body(carService.getByAgency(agencyId));
     }
 
@@ -74,6 +81,7 @@ public class CarController {
     public ResponseEntity<List<CarResponseDTO>> getAvailableCars(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        log.info("GET /api/cars/available?startDate={}&endDate={}", startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(carService.getAvailableCars(startDate, endDate));
     }
 
@@ -86,6 +94,7 @@ public class CarController {
             @PathVariable Long categoryId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        log.info("GET /api/cars/available/category/{}?startDate={}&endDate={}", categoryId, startDate, endDate);
         List<CarResponseDTO> response = carService.getAvailableCarsByCategory(categoryId, startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(carService.getAvailableCarsByCategory(categoryId, startDate, endDate));
     }
@@ -99,6 +108,7 @@ public class CarController {
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        log.info("GET /api/cars/{}/availability?startDate={}&endDate={}", id, startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(carService.isCarAvailable(id, startDate, endDate));
     }
 
@@ -110,6 +120,7 @@ public class CarController {
     public ResponseEntity<CarResponseDTO> updateCar(
             @PathVariable Long id,
             @Valid @RequestBody CarRequestDTO requestDTO) {
+        log.info("PUT /api/cars/{} - Mise à jour de la voiture", id);
         return ResponseEntity.status(HttpStatus.OK).body(carService.update(id, requestDTO));
     }
 
@@ -119,6 +130,7 @@ public class CarController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCar(@PathVariable Long id) {
+        log.info("DELETE /api/cars/{} - Suppression de la voiture", id);
         carService.delete(id);
         return ResponseEntity.noContent().build();
     }

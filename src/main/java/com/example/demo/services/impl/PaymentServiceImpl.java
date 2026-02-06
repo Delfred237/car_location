@@ -13,6 +13,7 @@ import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.mapper.PaymentMapper;
 import com.example.demo.services.PaymentService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(readOnly = true)
 @AllArgsConstructor
 @Service
@@ -35,6 +37,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentResponseDTO create(PaymentRequestDTO requestDTO) {
+        log.info("Création d'un nouveau paiement pour la réservation ID : {}", requestDTO.getReservationId());
+
         // Récupérer la réservation
         Reservation reservation = reservationRepository.findById(requestDTO.getReservationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", requestDTO.getReservationId()));
@@ -51,11 +55,14 @@ public class PaymentServiceImpl implements PaymentService {
 
         Payment savedPayment = paymentRepository.save(payment);
 
+        log.info("Paiement créé avec succès : ID {}", savedPayment.getId());
         return paymentMapper.toDTO(savedPayment);
     }
 
     @Override
     public PaymentResponseDTO getById(Long id) {
+        log.info("Recherche du paiement avec ID : {}", id);
+
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", "id", id));
 
@@ -64,6 +71,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentResponseDTO> getAll() {
+        log.info("Récupération de tous les paiements");
+
         return paymentRepository.findAll().stream()
                 .map(paymentMapper::toDTO)
                 .collect(Collectors.toList());
@@ -71,6 +80,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentResponseDTO> getByReservation(Long reservationId) {
+        log.info("Recherche des paiements de la réservation ID : {}", reservationId);
+
         // Vérifier que la réservation existe
         if (!reservationRepository.existsById(reservationId)) {
             throw new ResourceNotFoundException("Reservation", "id", reservationId);
@@ -83,6 +94,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentResponseDTO> getByStatus(PaymentStatus status) {
+        log.info("Recherche des paiements avec le statut : {}", status);
+
         return paymentRepository.findByStatus(status).stream()
                 .map(paymentMapper::toDTO)
                 .collect(Collectors.toList());
@@ -90,6 +103,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentResponseDTO> getPaymentsBetweenDates(LocalDateTime startDate, LocalDateTime endDate) {
+        log.info("Recherche des paiements entre {} et {}", startDate, endDate);
+
         return paymentRepository.findPaymentsBetweenDates(startDate, endDate).stream()
                 .map(paymentMapper::toDTO)
                 .collect(Collectors.toList());
@@ -98,6 +113,8 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentResponseDTO updateStatus(Long id, PaymentStatus newStatus) {
+        log.info("Mise à jour du statut du paiement ID {} vers {}", id, newStatus);
+
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", "id", id));
 
@@ -107,12 +124,15 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus(newStatus);
         Payment updatedPayment = paymentRepository.save(payment);
 
+        log.info("Statut du paiement mis à jour avec succès : ID {}", updatedPayment.getId());
         return paymentMapper.toDTO(updatedPayment);
     }
 
     @Override
     @Transactional
     public PaymentResponseDTO processPayment(Long id) {
+        log.info("Traitement du paiement ID : {}", id);
+
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment", "id", id));
 
@@ -129,8 +149,10 @@ public class PaymentServiceImpl implements PaymentService {
 
             // Envoie de l'email de confirmation de paiement
             emailService.sendPaymentConfirmation(payment.getReservation(), payment.getTransactionId());
+            log.info("Paiement traité avec succès : ID {}", id);
         } else {
             payment.setStatus(PaymentStatus.FAILED);
+            log.warn("Échec du traitement du paiement : ID {}", id);
         }
 
         Payment processedPayment = paymentRepository.save(payment);
@@ -139,17 +161,42 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Double getTotalPaidAmount(Long reservationId) {
-        return 0.0;
+        log.info("Calcul du montant total payé pour la réservation ID : {}", reservationId);
+
+        // Vérifier que la réservation existe
+        if (!reservationRepository.existsById(reservationId)) {
+            throw new ResourceNotFoundException("Reservation", "id", reservationId);
+        }
+
+        return paymentRepository.calculateTotalPaidAmount(reservationId);
     }
 
     @Override
     public boolean hasCompletedPayment(Long reservationId) {
-        return false;
+        log.info("Vérification de l'existence d'un paiement complété pour la réservation ID : {}", reservationId);
+
+        // Vérifier que la réservation existe
+        if (!reservationRepository.existsById(reservationId)) {
+            throw new ResourceNotFoundException("Reservation", "id", reservationId);
+        }
+
+        return paymentRepository.hasCompletedPayment(reservationId);
     }
 
     @Override
     public void delete(Long id) {
+        log.info("Suppression du paiement ID : {}", id);
 
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment", "id", id));
+
+        // Ne pas supprimer les paiements complétés (pour l'audit)
+        if (payment.getStatus() == PaymentStatus.COMPLETED) {
+            throw new BusinessException("Les paiements complétés ne peuvent pas être supprimés");
+        }
+
+        paymentRepository.delete(payment);
+        log.info("Paiement supprimé avec succès : ID {}", id);
     }
 
 

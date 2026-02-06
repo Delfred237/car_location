@@ -15,6 +15,7 @@ import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.mapper.CarMapper;
 import com.example.demo.services.CarService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
@@ -38,6 +40,8 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional
     public CarResponseDTO create(CarRequestDTO requestDTO) {
+        log.info("Création d'une nouvelle voiture : {}", requestDTO.getLicensePlate());
+
         // Vérifier si la plaque existe déjà
         if (carRepository.existsByLicensePlate(requestDTO.getLicensePlate())) {
             throw new ResourceAlreadyExistsException("Car", "licensePlate", requestDTO.getLicensePlate());
@@ -60,11 +64,14 @@ public class CarServiceImpl implements CarService {
 
         Car savedCar = carRepository.save(car);
 
+        log.info("Voiture créée avec succès : ID {}", savedCar.getId());
         return carMapper.toDTO(savedCar);
     }
 
     @Override
     public CarResponseDTO getById(Long id) {
+        log.info("Recherche de la voiture avec ID : {}", id);
+
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car", "id", id));
 
@@ -73,6 +80,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarResponseDTO> getAll() {
+        log.info("Récupération de toutes les voitures");
+
         return carRepository.findAll().stream()
                 .map(carMapper::toDTO)
                 .collect(Collectors.toList());
@@ -80,6 +89,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarResponseDTO> getByCategory(Long categoryId) {
+        log.info("Recherche des voitures de la catégorie ID : {}", categoryId);
+
         // Vérifier que la catégorie existe
         if (!categoryRepository.existsById(categoryId)) {
             throw new ResourceNotFoundException("Category", "id", categoryId);
@@ -92,6 +103,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarResponseDTO> getByAgency(Long agencyId) {
+        log.info("Recherche des voitures de l'agence ID : {}", agencyId);
+
         // Vérifier que l'agence existe
         if (!agencyRepository.existsById(agencyId)) {
             throw new ResourceNotFoundException("Agency", "id", agencyId);
@@ -104,6 +117,8 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarResponseDTO> getAvailableCars(LocalDate startDate, LocalDate endDate) {
+        log.info("Recherche des voitures disponibles du {} au {}", startDate, endDate);
+
         return carRepository.findAvailableCars(startDate, endDate).stream()
                 .map(carMapper::toDTO)
                 .collect(Collectors.toList());
@@ -111,6 +126,9 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public List<CarResponseDTO> getAvailableCarsByCategory(Long categoryId, LocalDate startDate, LocalDate endDate) {
+        log.info("Recherche des voitures disponibles de la catégorie {} du {} au {}",
+                categoryId, startDate, endDate);
+
         // Vérifier que la catégorie existe
         if (!categoryRepository.existsById(categoryId)) {
             throw new ResourceNotFoundException("Category", "id", categoryId);
@@ -124,6 +142,8 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional
     public CarResponseDTO update(Long id, CarRequestDTO requestDTO) {
+        log.info("Mise à jour de la voiture ID : {}", id);
+
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car", "id", id));
 
@@ -150,20 +170,27 @@ public class CarServiceImpl implements CarService {
 
         Car updatedCar = carRepository.save(car);
 
+        log.info("Voiture mise à jour avec succès : ID {}", updatedCar.getId());
         return carMapper.toDTO(updatedCar);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        log.info("Suppression de la voiture ID : {}", id);
+
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Car", "id", id));
 
         carRepository.delete(car);
+        log.info("Voiture supprimée avec succès : ID {}", id);
     }
 
     @Override
     public boolean isCarAvailable(Long carId, LocalDate startDate, LocalDate endDate) {
+        log.info("Vérification de la disponibilité de la voiture ID {} du {} au {}",
+                carId, startDate, endDate);
+
         // Vérifier que la voiture existe
         if (!carRepository.existsById(carId)) {
             throw new ResourceNotFoundException("Car", "id", carId);

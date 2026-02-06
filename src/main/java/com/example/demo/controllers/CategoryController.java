@@ -5,12 +5,14 @@ import com.example.demo.dto.response.CategoryResponseDTO;
 import com.example.demo.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequestMapping("/categories")
 @RequiredArgsConstructor
 @RestController
@@ -25,7 +27,8 @@ public class CategoryController {
      */
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> createCategory(@Valid @RequestBody CategoryRequestDTO requestDTO) {
-       return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(requestDTO));
+        log.info("POST /api/categories - Création d'une catégorie : {}", requestDTO.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(requestDTO));
     }
 
     /**
@@ -34,6 +37,7 @@ public class CategoryController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long id) {
+        log.info("GET /api/categories/{} - Récupération de la catégorie", id);
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.getById(id));
     }
 
@@ -43,6 +47,7 @@ public class CategoryController {
      */
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
+        log.info("GET /api/categories - Récupération de toutes les catégories");
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.getAll());
     }
 
@@ -52,6 +57,7 @@ public class CategoryController {
      */
     @GetMapping("/search")
     public ResponseEntity<CategoryResponseDTO> getCategoryByName(@RequestParam String name) {
+        log.info("GET /api/categories/search?name={} - Recherche par nom", name);
        return ResponseEntity.status(HttpStatus.OK).body(categoryService.getByName(name));
     }
 
@@ -63,6 +69,7 @@ public class CategoryController {
     public ResponseEntity<CategoryResponseDTO> updateCategory(
             @PathVariable Long id,
             @Valid @RequestBody CategoryRequestDTO requestDTO) {
+        log.info("PUT /api/categories/{} - Mise à jour de la catégorie", id);
         return ResponseEntity.status(HttpStatus.OK).body(categoryService.update(id, requestDTO));
     }
 
@@ -72,6 +79,7 @@ public class CategoryController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        log.info("DELETE /api/categories/{} - Suppression de la catégorie", id);
         categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }

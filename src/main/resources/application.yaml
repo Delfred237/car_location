@@ -61,3 +61,16 @@ server:
   servlet:
     context-path: /api
   port: 8000
+
+# Logs
+logging:
+  level:
+    org:
+      springframework: INFO
+      hibernate:
+        sql: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+    root: INFO

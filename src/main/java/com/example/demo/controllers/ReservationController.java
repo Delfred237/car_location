@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RequestMapping("/reservation")
 @RequiredArgsConstructor
 @RestController
@@ -30,7 +31,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponseDTO> createReservation(
             @Valid @RequestBody ReservationRequestDTO requestDTO) {
-        System.out.println("POST /api/reservations?userId={} - Création d'une réservation");
+        log.info("POST /api/reservations?userId={} - Création d'une réservation", requestDTO.getUserId());
         ReservationResponseDTO response = reservationService.create(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -41,7 +42,7 @@ public class ReservationController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponseDTO> getReservationById(@PathVariable Long id) {
-        System.out.println(String.format("GET /api/reservations/{} - Récupération de la réservation", id));
+        log.info("GET /api/reservations/{} - Récupération de la réservation", id);
         ReservationResponseDTO response = reservationService.getById(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -52,7 +53,7 @@ public class ReservationController {
      */
     @GetMapping
     public ResponseEntity<List<ReservationResponseDTO>> getAllReservations() {
-        System.out.println("GET /api/reservations - Récupération de toutes les réservations");
+        log.info("GET /api/reservations - Récupération de toutes les réservations");
         List<ReservationResponseDTO> response = reservationService.getAll();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -63,7 +64,7 @@ public class ReservationController {
      */
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ReservationResponseDTO>> getReservationsByUser(@PathVariable Long userId) {
-        System.out.println(String.format("GET /api/reservations/user/{} - Réservations de l'utilisateur", userId));
+        log.info("GET /api/reservations/user/{} - Réservations de l'utilisateur", userId);
         List<ReservationResponseDTO> response = reservationService.getByUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -74,7 +75,7 @@ public class ReservationController {
      */
     @GetMapping("/car/{carId}")
     public ResponseEntity<List<ReservationResponseDTO>> getReservationsByCar(@PathVariable Long carId) {
-        System.out.println(String.format("GET /api/reservations/car/{} - Réservations de la voiture", carId));
+        log.info("GET /api/reservations/car/{} - Réservations de la voiture", carId);
         List<ReservationResponseDTO> response = reservationService.getByCar(carId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -85,7 +86,7 @@ public class ReservationController {
      */
     @GetMapping("/status/{status}")
     public ResponseEntity<List<ReservationResponseDTO>> getReservationsByStatus(@PathVariable ReservationStatus status) {
-        System.out.println(String.format("GET /api/reservations/status/{} - Réservations par statut", status));
+        log.info("GET /api/reservations/status/{} - Réservations par statut", status);
         List<ReservationResponseDTO> response = reservationService.getByStatus(status);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -96,7 +97,7 @@ public class ReservationController {
      */
     @GetMapping("/user/{userId}/upcoming")
     public ResponseEntity<List<ReservationResponseDTO>> getUpcomingReservations(@PathVariable Long userId) {
-        System.out.println(String.format("GET /api/reservations/user/{}/upcoming - Réservations à venir", userId));
+        log.info("GET /api/reservations/user/{}/upcoming - Réservations à venir", userId);
         List<ReservationResponseDTO> response = reservationService.getUpcomingReservationsByUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -107,7 +108,7 @@ public class ReservationController {
      */
     @GetMapping("/user/{userId}/history")
     public ResponseEntity<List<ReservationResponseDTO>> getReservationHistory(@PathVariable Long userId) {
-        System.out.println(String.format("GET /api/reservations/user/{}/history - Historique des réservations", userId));
+        log.info("GET /api/reservations/user/{}/history - Historique des réservations", userId);
         List<ReservationResponseDTO> response = reservationService.getReservationHistoryByUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -120,7 +121,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponseDTO> updateReservationStatus(
             @PathVariable Long id,
             @RequestParam ReservationStatus newStatus) {
-        System.out.println(String.format("PATCH /api/reservations/{}/status?newStatus={}", id, newStatus));
+        log.info("PATCH /api/reservations/{}/status?newStatus={}", id, newStatus);
         ReservationResponseDTO response = reservationService.updateStatus(id, newStatus);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -131,7 +132,7 @@ public class ReservationController {
      */
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ReservationResponseDTO> cancelReservation(@PathVariable Long id) {
-        System.out.println(String.format("POST /api/reservations/{}/cancel - Annulation de la réservation", id));
+        log.info("POST /api/reservations/{}/cancel - Annulation de la réservation", id);
         ReservationResponseDTO response = reservationService.cancelReservation(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -142,7 +143,7 @@ public class ReservationController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
-        System.out.println(String.format("DELETE /api/reservations/{} - Suppression de la réservation", id));
+        log.info("DELETE /api/reservations/{} - Suppression de la réservation", id);
         reservationService.delete(id);
         return ResponseEntity.noContent().build();
     }

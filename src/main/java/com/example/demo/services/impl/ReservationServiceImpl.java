@@ -20,6 +20,7 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
@@ -45,6 +47,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     public ReservationResponseDTO create(ReservationRequestDTO requestDTO) {
+        log.info("Création d'une nouvelle réservation pour l'utilisateur ID : {}", requestDTO.getUserId());
+
         // Récupérer l'utilisateur
         User user = userRepository.findById(requestDTO.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", requestDTO.getUserId()));
@@ -78,11 +82,13 @@ public class ReservationServiceImpl implements ReservationService {
         // Envoie de l'eamil de confirmation
         emailService.sendReservationConfirmation(savedReservation);
 
+        log.info("Réservation créée avec succès : ID {}", savedReservation.getId());
         return reservationMapper.toDTO(savedReservation);
     }
 
     @Override
     public ReservationResponseDTO getById(Long id) {
+        log.info("Recherche de la réservation avec ID : {}", id);
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", id));
 
@@ -91,6 +97,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getAll() {
+        log.info("Récupération de toutes les réservations");
+
         return reservationRepository.findAll().stream()
                 .map(reservationMapper::toDTO)
                 .collect(Collectors.toList());
@@ -98,6 +106,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getByUser(Long userId) {
+        log.info("Recherche des réservations de l'utilisateur ID : {}", userId);
+
         // Vérifier que l'utilisateur existe
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
@@ -110,6 +120,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getByCar(Long carId) {
+        log.info("Recherche des réservations de la voiture ID : {}", carId);
+
         // Vérifier que la voiture existe
         if (!carRepository.existsById(carId)) {
             throw new ResourceNotFoundException("Car", "id", carId);
@@ -122,6 +134,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getByStatus(ReservationStatus status) {
+        log.info("Recherche des réservations avec le statut : {}", status);
+
         return reservationRepository.findByStatus(status).stream()
                 .map(reservationMapper::toDTO)
                 .collect(Collectors.toList());
@@ -129,6 +143,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getUpcomingReservationsByUser(Long userId) {
+        log.info("Recherche des réservations à venir de l'utilisateur ID : {}", userId);
+
         // Vérifier que l'utilisateur existe
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
@@ -142,6 +158,8 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public List<ReservationResponseDTO> getReservationHistoryByUser(Long userId) {
+        log.info("Recherche de l'historique des réservations de l'utilisateur ID : {}", userId);
+
         // Vérifier que l'utilisateur existe
         if (!userRepository.existsById(userId)) {
             throw new ResourceNotFoundException("User", "id", userId);
@@ -156,6 +174,8 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     public ReservationResponseDTO updateStatus(Long id, ReservationStatus newStatus) {
+        log.info("Mise à jour du statut de la réservation ID {} vers {}", id, newStatus);
+
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", id));
 
@@ -165,12 +185,15 @@ public class ReservationServiceImpl implements ReservationService {
         reservation.setStatus(newStatus);
         Reservation updatedReservation = reservationRepository.save(reservation);
 
+        log.info("Statut de la réservation mis à jour avec succès : ID {}", updatedReservation.getId());
         return reservationMapper.toDTO(updatedReservation);
     }
 
     @Override
     @Transactional
     public ReservationResponseDTO cancelReservation(Long id) {
+        log.info("Annulation de la réservation ID : {}", id);
+
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", id));
 
@@ -186,16 +209,19 @@ public class ReservationServiceImpl implements ReservationService {
         // Envoie de l'email d'annulation
         emailService.sendReservationCancellation(cancelledReservation);
 
+        log.info("Réservation annulée avec succès : ID {}", cancelledReservation.getId());
         return reservationMapper.toDTO(cancelledReservation);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        log.info("Suppression de la réservation ID : {}", id);
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", id));
 
         reservationRepository.delete(reservation);
+        log.info("Réservation supprimée avec succès : ID {}", id);
     }
 
 
