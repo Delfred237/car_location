@@ -47,7 +47,6 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<AgencyResponseDTO> getById(Long id) {
         Agency agency = agencyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Agency", "id", id));

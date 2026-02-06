@@ -5,6 +5,7 @@ import com.example.demo.exceptions.BusinessException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -32,8 +33,8 @@ public class EmailServiceImpl implements EmailService{
     @Value("${app.mail.fromName}")
     private String fromName;
 
-    @Value("${app.base.url}")
-    private String baseUrl;
+//    @Value("${app.base.url}")
+//    private String baseUrl;
 
 
     @Override
@@ -95,8 +96,8 @@ public class EmailServiceImpl implements EmailService{
 
         EmailDetailsDTO emailDetailsDTO = EmailDetailsDTO.builder()
                 .recipient(reservation.getUser().getEmail())
-                .subject("Confirmation de paiement - Réservation #" + reservation.getId())
-                .templateName("email/payment-confirmation")
+                .subject("Confirmation de réservation #" + reservation.getId())
+                .templateName("/reservation-confirmation")
                 .templateModel(model)
                 .build();
 
@@ -116,7 +117,7 @@ public class EmailServiceImpl implements EmailService{
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(reservation.getUser().getEmail())
                 .subject("Annulation de votre réservation #" + reservation.getId())
-                .templateName("email/reservation-cancellation")
+                .templateName("/reservation-cancellation")
                 .templateModel(model)
                 .build();
 
@@ -139,7 +140,7 @@ public class EmailServiceImpl implements EmailService{
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(reservation.getUser().getEmail())
                 .subject("Rappel : Votre location commence bientôt !")
-                .templateName("email/reservation-reminder")
+                .templateName("/reservation-reminder")
                 .templateModel(model)
                 .build();
 
@@ -159,7 +160,7 @@ public class EmailServiceImpl implements EmailService{
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(reservation.getUser().getEmail())
                 .subject("Confirmation de paiement - Réservation #" + reservation.getId())
-                .templateName("email/payment-confirmation")
+                .templateName("/payment-confirmation")
                 .templateModel(model)
                 .build();
 

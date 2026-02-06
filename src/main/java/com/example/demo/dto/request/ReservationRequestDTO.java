@@ -1,5 +1,6 @@
 package com.example.demo.dto.request;
 
+import com.example.demo.entites.User;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
@@ -24,4 +25,7 @@ public class ReservationRequestDTO {
 
     @NotNull(message = "La voiture est obligatoire")
     private Long carId;
+
+    @NotNull(message = "L'utilisateur est obligatoire")
+    private Long userId;
 }

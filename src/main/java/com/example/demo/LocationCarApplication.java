@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.example.demo.mapper.MapperConfig;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -10,5 +11,4 @@ public class LocationCarApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LocationCarApplication.class, args);
 	}
-
 }

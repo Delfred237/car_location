@@ -33,13 +33,5 @@ public class UserRequestDTO {
     @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Numéro de téléphone invalide")
     private String phoneNumber;
 
-    @NotBlank(message = "Le type de pièce est obligatoire")
-    private String piece;
-
-    private PieceType pieceType;
-
-    @NotBlank(message = "Le numéro de pièce est obligatoire")
-    private String pieceNumber;
-
-    private String pieceFilePath;
+    private String imagePath;
 }

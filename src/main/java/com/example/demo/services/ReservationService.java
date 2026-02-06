@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReservationService {
 
-    ReservationResponseDTO create(ReservationRequestDTO requestDTO, Long userId);
+    ReservationResponseDTO create(ReservationRequestDTO requestDTO);
 
     ReservationResponseDTO getById(Long id);
 

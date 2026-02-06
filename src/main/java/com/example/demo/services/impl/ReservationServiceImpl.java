@@ -44,10 +44,10 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     @Transactional
-    public ReservationResponseDTO create(ReservationRequestDTO requestDTO, Long userId) {
+    public ReservationResponseDTO create(ReservationRequestDTO requestDTO) {
         // Récupérer l'utilisateur
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+        User user = userRepository.findById(requestDTO.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", requestDTO.getUserId()));
 
         // Récupérer la voiture
         Car car = carRepository.findById(requestDTO.getCarId())
