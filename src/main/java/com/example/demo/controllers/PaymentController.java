@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequestMapping("/payments")
@@ -43,7 +44,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponseDTO> getPaymentById(@PathVariable Long id) {
         log.info("GET /api/payments/{} - Récupération du paiement", id);
         PaymentResponseDTO response = paymentService.getById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -54,7 +55,7 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
         log.info("GET /api/payments - Récupération de tous les paiements");
         List<PaymentResponseDTO> response = paymentService.getAll();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -65,7 +66,7 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByReservation(@PathVariable Long reservationId) {
         log.info("GET /api/payments/reservation/{} - Paiements de la réservation", reservationId);
         List<PaymentResponseDTO> response = paymentService.getByReservation(reservationId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -76,7 +77,7 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponseDTO>> getPaymentsByStatus(@PathVariable PaymentStatus status) {
         log.info("GET /api/payments/status/{} - Paiements par statut", status);
         List<PaymentResponseDTO> response = paymentService.getByStatus(status);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -89,7 +90,7 @@ public class PaymentController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
         log.info("GET /api/payments/dates?start={}&end={}", start, end);
         List<PaymentResponseDTO> response = paymentService.getPaymentsBetweenDates(start, end);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -100,7 +101,7 @@ public class PaymentController {
     public ResponseEntity<Double> getTotalPaidAmount(@PathVariable Long reservationId) {
         log.info("GET /api/payments/reservation/{}/total - Calcul du montant total payé", reservationId);
         Double totalAmount = paymentService.getTotalPaidAmount(reservationId);
-        return ResponseEntity.ok(totalAmount);
+        return ResponseEntity.status(HttpStatus.OK).body(totalAmount);
     }
 
     /**
@@ -111,7 +112,29 @@ public class PaymentController {
     public ResponseEntity<Boolean> hasCompletedPayment(@PathVariable Long reservationId) {
         log.info("GET /api/payments/reservation/{}/has-completed", reservationId);
         Boolean hasCompleted = paymentService.hasCompletedPayment(reservationId);
-        return ResponseEntity.ok(hasCompleted);
+        return ResponseEntity.status(HttpStatus.OK).body(hasCompleted);
+    }
+
+    /**
+     * Obtenir les statistiques de paiement d'une réservation
+     * GET /api/payments/reservation/{reservationId}/stats
+     */
+    @GetMapping("/reservation/{reservationId}/stats")
+    public ResponseEntity<Map<String, Object>> getReservationPaymentStats(@PathVariable Long reservationId) {
+        log.info("GET /api/payments/reservation/{}/stats", reservationId);
+        Map<String, Object> stats = paymentService.getReservationPaymentStats(reservationId);
+        return ResponseEntity.status(HttpStatus.OK).body(stats);
+    }
+
+    /**
+     * Obtenir le résumé des paiements par statut
+     * GET /api/payments/summary
+     */
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, Object>> getPaymentsSummary() {
+        log.info("GET /api/payments/summary");
+        Map<String, Object> stats = paymentService.getPaymentsSummary();
+        return ResponseEntity.status(HttpStatus.OK).body(stats);
     }
 
     /**
@@ -122,7 +145,7 @@ public class PaymentController {
     public ResponseEntity<PaymentResponseDTO> processPayment(@PathVariable Long id) {
         log.info("POST /api/payments/{}/process - Traitement du paiement", id);
         PaymentResponseDTO response = paymentService.processPayment(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -135,7 +158,7 @@ public class PaymentController {
             @RequestParam PaymentStatus newStatus) {
         log.info("PATCH /api/payments/{}/status?newStatus={}", id, newStatus);
         PaymentResponseDTO response = paymentService.updateStatus(id, newStatus);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

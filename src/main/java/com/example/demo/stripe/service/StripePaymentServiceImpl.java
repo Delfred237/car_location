@@ -2,10 +2,13 @@ package com.example.demo.stripe.service;
 
 import com.example.demo.Repository.PaymentRepository;
 import com.example.demo.Repository.ReservationRepository;
+import com.example.demo.Repository.StripeEventLogRepository;
 import com.example.demo.email.EmailService;
 import com.example.demo.entites.Payment;
 import com.example.demo.entites.Reservation;
+import com.example.demo.entites.StripeEventLog;
 import com.example.demo.enums.PaymentStatus;
+import com.example.demo.enums.ReservationStatus;
 import com.example.demo.exceptions.BusinessException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.stripe.dto.StripePaymentRequestDTO;
@@ -21,6 +24,7 @@ import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +34,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -37,6 +42,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
+    private final StripeEventLogRepository stripeEventLogRepository;
     private final EmailService emailService;
 
     @Value("${stripe.success.url}")
@@ -48,15 +54,15 @@ public class StripePaymentServiceImpl implements StripePaymentService {
 
     @Override
     public StripePaymentResponseDTO createCheckoutSession(StripePaymentRequestDTO requestDTO) {
-        System.out.println(String.format("Création d'une session Stripe Checkout pour la réservation ID : {}", requestDTO.getReservationId()));
+        log.info("Création d'une session Stripe Checkout pour la réservation ID : {}", requestDTO.getReservationId());
 
         try {
             // Recuperer la reservation
             Reservation reservation = reservationRepository.findById(requestDTO.getReservationId())
                     .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", requestDTO.getReservationId()));
 
-            // Convertir le montant en centimes (Stripe utilise les plus petites unites)
-            long amountInCents = requestDTO.getAmount().multiply(BigDecimal.valueOf(100)).longValue();
+            BigDecimal amount = reservation.getTotalPrice();
+            long amountInCents = amount.multiply(BigDecimal.valueOf(100)).longValue();
 
             // Metadonnees pour retrouver la reservation dans le webhook
             Map<String, String> metadata = new HashMap<>();
@@ -106,11 +112,11 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                     .paymentMethod("STRIPE")
                     .paymentDate(LocalDateTime.now())
                     .status(PaymentStatus.PENDING)
-                    .transactionId(session.getPaymentIntent())
+                    .transactionId(session.getId())
                     .build();
             paymentRepository.save(payment);
 
-            System.out.println("Session Stripe créée avec succès : {}" + session.getId());
+            log.info("Session Stripe créée avec succès : {}", session.getId());
 
             return StripePaymentResponseDTO.builder()
                     .sessionId(session.getId())
@@ -120,74 +126,18 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                     .reservationId(reservation.getId())
                     .build();
         } catch (StripeException e) {
-            System.out.println(String.format("Erreur Stripe lors de la création de la session : {}", e.getMessage(), e));
+            log.error("Erreur Stripe lors de la création de la session : {}", e.getMessage(), e);
             throw new BusinessException("Impossible de créer la session de paiement Stripe : " + e.getMessage());
         }
     }
 
     @Override
-    public StripePaymentResponseDTO createPaymentIntent(StripePaymentRequestDTO requestDTO) {
-        System.out.println(String.format("Création d'un PaymentIntent pour la réservation ID : {}", requestDTO.getReservationId()));
-
-        try {
-            // Recuperer la reservation
-            Reservation reservation = reservationRepository.findById(requestDTO.getReservationId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", requestDTO.getReservationId()));
-
-            long amountInCents = requestDTO.getAmount().multiply(BigDecimal.valueOf(100)).longValue();
-
-            // Metadonnees pour retrouver la reservation dans le webhook
-            Map<String, String> metadata = new HashMap<>();
-            metadata.put("reservationId", String.valueOf(reservation.getId()));
-            metadata.put("userId", String.valueOf(reservation.getUser().getId()));
-
-            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                    .setAmount(amountInCents)
-                    .setCurrency(requestDTO.getCurrency().toLowerCase())
-                    .setDescription(requestDTO.getDescription())
-                    .putAllMetadata(metadata)
-                    .setReceiptEmail(reservation.getUser().getEmail())
-                    .build();
-            PaymentIntent paymentIntent = PaymentIntent.create(params);
-
-            // Creer l'enregistrement du paiement
-            Payment payment = Payment.builder()
-                    .reservation(reservation)
-                    .amount(requestDTO.getAmount())
-                    .paymentMethod("STRIPE")
-                    .paymentDate(LocalDateTime.now())
-                    .status(PaymentStatus.PENDING)
-                    .transactionId(paymentIntent.getId())
-                    .build();
-            paymentRepository.save(payment);
-
-            System.out.println(String.format("PaymentIntent créé avec succès : {}", paymentIntent.getId()));
-
-            return StripePaymentResponseDTO.builder()
-                    .paymentIntentId(paymentIntent.getId())
-                    .status(paymentIntent.getStatus())
-                    .reservationId(reservation.getId())
-                    .build();
-        } catch (StripeException e) {
-            System.out.println(String.format("Erreur Stripe lors de la création du PaymentIntent : {}", e.getMessage(), e));
-            throw new BusinessException("Impossible de créer le PaymentIntent : " + e.getMessage());
-        }
-    }
-
-    @Override
     public void handleWebhookEvent(Event event) {
-        System.out.println(String.format("Traitement du webhook Stripe : Type = {}, ID = {}", event.getType(), event.getId()));
+        log.info("Traitement du webhook Stripe : Type = {}, ID = {}", event.getType(), event.getId());
 
         switch (event.getType()) {
             case "checkout.session.completed":
                 handleCheckoutSessionCompleted(event);
-                break;
-            case "payment_intent.succeeded":
-                handlePaymentIntentSucceeded(event);
-                break;
-
-            case "payment_intent.payment_failed":
-                handlePaymentIntentFailed(event);
                 break;
 
             case "charge.refunded":
@@ -195,8 +145,18 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                 break;
 
             default:
-                System.out.println(String.format("Type d'événement non géré : {}", event.getType()));
+                log.info("Type d'événement non géré : {}", event.getType());
         }
+
+        // Enregistrer l’event comme traité
+        stripeEventLogRepository.save(
+                new StripeEventLog(
+                        null,
+                        event.getId(),
+                        event.getType(),
+                        LocalDateTime.now()
+                )
+        );
     }
 
 
@@ -204,16 +164,16 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
 
         if (session == null) {
-            System.out.println("Session null dans l'événement checkout.session.completed");
+            log.error("Session null dans l'événement checkout.session.completed");
             return;
         }
 
-        System.out.println(String.format("Session Checkout complétée : {}", session.getId()));
+        log.info("Session Checkout complétée : {}", session.getId());
 
         // Recuperer l'ID de reservation depuis les metadonnees
         String reservationIdStr = session.getMetadata().get("reservationId");
         if (reservationIdStr == null) {
-            System.out.println("Aucun reservationId dans les métadonnées de la session");
+            log.error("Aucun reservationId dans les métadonnées de la session");
             return;
         }
 
@@ -223,67 +183,72 @@ public class StripePaymentServiceImpl implements StripePaymentService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation", "id", reservationId));
 
+        // Vérifier montant côté serveur
+        BigDecimal expectedAmount = reservation.getTotalPrice();
+        BigDecimal paidAmount = BigDecimal
+                .valueOf(session.getAmountTotal())
+                .divide(BigDecimal.valueOf(100));
+
+        if (paidAmount.compareTo(expectedAmount) < 0) {
+            log.error("Montant incohérent pour reservation {}", reservationId);
+            return;
+        }
+
         Payment payment = paymentRepository.findByReservationId(reservationId)
                 .stream()
-                .filter(p -> p.getStatus() == PaymentStatus.PENDING)
+                .filter(p -> p.getStatus() == PaymentStatus.PENDING &&
+                        "STRIPE".equalsIgnoreCase(p.getPaymentMethod()))
                 .findFirst()
                 .orElse(null);
+
+        if (payment != null && payment.getStatus() == PaymentStatus.COMPLETED) {
+            log.info("Paiement déjà traité pour la session {}", session.getId());
+            return;
+        }
 
         if (payment != null) {
             payment.setStatus(PaymentStatus.COMPLETED);
             payment.setTransactionId(session.getPaymentIntent());
             paymentRepository.save(payment);
+        } else {
+            // Creation d'un nouveau paiement
+            log.warn("Aucun paiement PENDING trouvé, création d'un nouveau paiement");
 
-            // Envoyer l'email de confirmation
-            emailService.sendPaymentConfirmation(reservation, session.getPaymentIntent());
+            // Récupérer le montant depuis la session
+            Long amountInCents = session.getAmountTotal();
+            BigDecimal amount = BigDecimal.valueOf(amountInCents).divide(BigDecimal.valueOf(100));
 
-            System.out.println(String.format("Paiement marqué comme COMPLETED pour la réservation ID : {}", reservationId));
-        }
-    }
-
-    private void handlePaymentIntentSucceeded(Event event) {
-        PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
-
-        if (paymentIntent == null) {
-            System.out.println("PaymentIntent null dans l'événement payment_intent.succeeded");
-            return;
-        }
-
-        System.out.println(String.format("PaymentIntent réussi : {}", paymentIntent.getId()));
-
-        // Mettre a jour le statut du paiement
-        Payment payment = paymentRepository.findByTransactionId(paymentIntent.getId())
-                .orElse(null);
-
-        if (payment != null && payment.getStatus().equals(PaymentStatus.PENDING)) {
-            payment.setStatus(PaymentStatus.COMPLETED);
-            payment.setTransactionId(paymentIntent.getId());
-            paymentRepository.save(payment);
-
-            System.out.println(String.format("Paiement mis à jour en COMPLETED : Transaction ID = {}", paymentIntent.getId()));
-        }
-    }
-
-    private void handlePaymentIntentFailed(Event event) {
-        PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
-
-        if (paymentIntent == null) {
-            System.out.println("PaymentIntent null dans l'événement payment_intent.succeeded");
-            return;
+            Payment newPayment = Payment.builder()
+                    .reservation(reservation)
+                    .amount(amount)
+                    .paymentMethod("STRIPE")
+                    .paymentDate(LocalDateTime.now())
+                    .status(PaymentStatus.COMPLETED)
+                    .transactionId(session.getPaymentIntent())
+                    .build();
+            paymentRepository.save(newPayment);
         }
 
-        System.out.println(String.format("PaymentIntent réussi : {}", paymentIntent.getId()));
+        // Vérifier si le paiement total est complet
+        BigDecimal totalPaid = paymentRepository.findByReservationId(reservationId)
+                .stream()
+                .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
+                .map(Payment::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Payment payment = paymentRepository.findByTransactionId(paymentIntent.getId())
-                .orElse(null);
-
-        if (payment != null) {
-            payment.setStatus(PaymentStatus.FAILED);
-            payment.setTransactionId(paymentIntent.getId());
-            paymentRepository.save(payment);
-
-            System.out.println(String.format("Paiement mis à jour en FAILED : Transaction ID = {}", paymentIntent.getId()));
+        // Si le montant total est payé, confirmer la réservation
+        if (totalPaid.compareTo(reservation.getTotalPrice()) >= 0) {
+            if (reservation.getStatus() == ReservationStatus.PENDING) {
+                reservation.setStatus(ReservationStatus.CONFIRMED);
+                reservationRepository.save(reservation);
+                log.info("Réservation ID {} confirmée suite au paiement Stripe complet", reservationId);
+            }
         }
+
+        // Envoie de l'email de confirmation
+        emailService.sendPaymentConfirmation(reservation, session.getPaymentIntent());
+
+        log.info("Paiement Stripe traité avec succès pour la réservation ID : {}", reservationId);
     }
 
     private void handleChargeRefunded(Event event) {

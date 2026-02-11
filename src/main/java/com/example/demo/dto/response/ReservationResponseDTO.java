@@ -31,6 +31,5 @@ public class ReservationResponseDTO {
     private String carModel;
     private String carLicensePlate;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime createdDate;
 }

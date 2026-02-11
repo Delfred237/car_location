@@ -14,11 +14,6 @@ public interface StripePaymentService {
     StripePaymentResponseDTO createCheckoutSession(StripePaymentRequestDTO requestDTO);
 
     /**
-     * Créer un PaymentIntent (pour paiements custom)
-     */
-    StripePaymentResponseDTO createPaymentIntent(StripePaymentRequestDTO requestDTO);
-
-    /**
      * Gérer les webhooks Stripe
      */
     void handleWebhookEvent(Event event);

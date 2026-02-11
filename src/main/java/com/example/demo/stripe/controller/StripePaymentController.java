@@ -8,6 +8,7 @@ import com.stripe.model.Event;
 import com.stripe.net.Webhook;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @RequestMapping("/stripe")
 @RequiredArgsConstructor
 @RestController
@@ -33,20 +35,8 @@ public class StripePaymentController {
     @PostMapping("/create-checkout-session")
     public ResponseEntity<StripePaymentResponseDTO> createCheckoutSession(
             @Valid @RequestBody StripePaymentRequestDTO requestDTO) {
-        System.out.println(String.format("POST /api/stripe/create-checkout-session - Réservation ID : {}", requestDTO.getReservationId()));
+        log.info("POST /api/stripe/create-checkout-session - Réservation ID : {}", requestDTO.getReservationId());
         StripePaymentResponseDTO response = stripePaymentService.createCheckoutSession(requestDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    /**
-     * Créer un PaymentIntent
-     * POST /api/stripe/create-payment-intent
-     */
-    @PostMapping("/create-payment-intent")
-    public ResponseEntity<StripePaymentResponseDTO> createPaymentIntent(
-            @Valid @RequestBody StripePaymentRequestDTO requestDTO) {
-        System.out.println(String.format("POST /api/stripe/create-payment-intent - Réservation ID : {}", requestDTO.getReservationId()));
-        StripePaymentResponseDTO response = stripePaymentService.createPaymentIntent(requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -59,16 +49,18 @@ public class StripePaymentController {
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader) {
 
-        System.out.println("POST /api/stripe/webhook - Réception d'un webhook Stripe");
-
+        log.info("POST /api/stripe/webhook - Réception d'un webhook Stripe");
         Event event;
 
         try {
             // Vérifier la signature du webhook
             event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
         } catch (SignatureVerificationException e) {
-            System.out.println(String.format("⚠️  Signature du webhook invalide : {}", e.getMessage()));
+            log.error("Signature Stripe invalide : {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
+        } catch (Exception e) {
+            log.error("Erreur parsing webhook", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         // Traiter l'événement
@@ -77,13 +69,28 @@ public class StripePaymentController {
         return ResponseEntity.status(HttpStatus.OK).body("Webhook received");
     }
 
+
+    /**
+     * URL de redirection après succès Stripe
+     * GET /api/stripe/success
+     */
+    @GetMapping("/success")
+    public ResponseEntity<String> paymentSuccess(
+            @RequestParam(required = false) String session_id) {
+
+        log.info("Redirection Stripe success - session_id: {}", session_id);
+
+        return ResponseEntity.ok("Paiement réussi. Vous pouvez fermer cette page.");
+    }
+
+
     /**
      * Annuler un paiement
      * POST /api/stripe/cancel/{paymentIntentId}
      */
-    @PostMapping("/cancel/{paymentIntentId}")
+    @PostMapping("/cancel")
     public ResponseEntity<Void> cancelPayment(@PathVariable String paymentIntentId) {
-        System.out.println(String.format("POST /api/stripe/cancel/{} - Annulation du paiement", paymentIntentId));
+        log.info("POST /api/stripe/cancel/{} - Annulation du paiement", paymentIntentId);
         stripePaymentService.cancelPayment(paymentIntentId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -96,7 +103,7 @@ public class StripePaymentController {
     public ResponseEntity<Void> refundPayment(
             @PathVariable String paymentIntentId,
             @RequestParam BigDecimal amount) {
-        System.out.println(String.format("POST /api/stripe/refund/{} - Montant : {}", paymentIntentId, amount));
+        log.info("POST /api/stripe/refund/{} - Montant : {}", paymentIntentId, amount);
         stripePaymentService.refundPayment(paymentIntentId, amount);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -107,7 +114,7 @@ public class StripePaymentController {
      */
     @GetMapping("/status/{paymentIntentId}")
     public ResponseEntity<String> getPaymentStatus(@PathVariable String paymentIntentId) {
-        System.out.println(String.format("GET /api/stripe/status/{}", paymentIntentId));
+        log.info("GET /api/stripe/status/{}", paymentIntentId);
         String status = stripePaymentService.getPaymentStatus(paymentIntentId);
         return ResponseEntity.status(HttpStatus.OK).body(status);
     }

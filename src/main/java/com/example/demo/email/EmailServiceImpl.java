@@ -1,7 +1,10 @@
 package com.example.demo.email;
 
+import com.example.demo.Repository.PaymentRepository;
+import com.example.demo.entites.Payment;
 import com.example.demo.entites.Reservation;
 import com.example.demo.entites.User;
+import com.example.demo.enums.PaymentStatus;
 import com.example.demo.exceptions.BusinessException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -17,7 +20,9 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +33,7 @@ public class EmailServiceImpl implements EmailService{
 
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
+    private final PaymentRepository paymentRepository;
 
     @Value("${app.mail.from}")
     private String fromEmail;
@@ -151,6 +157,13 @@ public class EmailServiceImpl implements EmailService{
 
     @Override
     public void sendPaymentConfirmation(Reservation reservation, String transactionId) {
+        // Récupérer le dernier paiement complété
+        Payment lastPayment = paymentRepository.findByReservationId(reservation.getId())
+                .stream()
+                .filter(p -> p.getStatus() == PaymentStatus.COMPLETED)
+                .max(Comparator.comparing(Payment::getPaymentDate))
+                .orElse(null);
+
         Map<String, Object> model = new HashMap<>();
         model.put("userName", reservation.getUser().getFullName());
         model.put("reservationId", reservation.getId());
@@ -158,6 +171,8 @@ public class EmailServiceImpl implements EmailService{
         model.put("amount", reservation.getTotalPrice());
         model.put("carBrand", reservation.getCar().getBrand());
         model.put("carModel", reservation.getCar().getModel());
+        model.put("paymentMethod", lastPayment != null ? lastPayment.getPaymentMethod() : "Stripe");
+        model.put("paymentDate", lastPayment != null ? lastPayment.getPaymentDate() : LocalDateTime.now());
 
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(reservation.getUser().getEmail())
@@ -183,7 +198,7 @@ public class EmailServiceImpl implements EmailService{
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(user.getEmail())
                 .subject("Vérification de votre compte Car Rental")
-                .templateName("email/account-verification")
+                .templateName("/account-verification")
                 .templateModel(model)
                 .build();
 
@@ -204,7 +219,7 @@ public class EmailServiceImpl implements EmailService{
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(user.getEmail())
                 .subject("Réinitialisation de votre mot de passe")
-                .templateName("email/password-reset")
+                .templateName("/password-reset")
                 .templateModel(model)
                 .build();
 
@@ -222,7 +237,7 @@ public class EmailServiceImpl implements EmailService{
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(user.getEmail())
                 .subject("Bienvenue chez Car Rental !")
-                .templateName("email/welcome")
+                .templateName("/welcome")
                 .templateModel(model)
                 .build();
 

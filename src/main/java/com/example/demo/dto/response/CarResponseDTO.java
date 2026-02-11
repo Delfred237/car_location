@@ -27,6 +27,5 @@ public class CarResponseDTO {
     private Long agencyId;
     private String agencyName;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime createdDate;
 }

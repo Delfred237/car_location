@@ -6,6 +6,7 @@ import com.example.demo.enums.PaymentStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public interface PaymentService {
 
@@ -24,6 +25,10 @@ public interface PaymentService {
     PaymentResponseDTO updateStatus(Long id, PaymentStatus newStatus);
 
     PaymentResponseDTO processPayment(Long id);
+
+    Map<String, Object> getReservationPaymentStats(Long reservationId);
+
+    Map<String, Object> getPaymentsSummary();
 
     Double getTotalPaidAmount(Long reservationId);
 

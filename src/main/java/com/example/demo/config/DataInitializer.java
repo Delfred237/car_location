@@ -73,8 +73,8 @@ public class DataInitializer {
 
                 // Client 1
                 User client1 = User.builder()
-                        .fullName("Jean Dupont")
-                        .email("jean.dupont@example.com")
+                        .fullName("Fossi Delfred")
+                        .email("tenedelfred19@gmail.com")
                         .password("Client@123") // TODO: Hacher avec BCrypt
                         .phoneNumber("+237600000002")
                         .build();
@@ -85,8 +85,8 @@ public class DataInitializer {
 
                 // Client 2
                 User client2 = User.builder()
-                        .fullName("Marie Kameni")
-                        .email("marie.kameni@example.com")
+                        .fullName("Del Coding")
+                        .email("delcodeur@gmail.com")
                         .password("Client@123") // TODO: Hacher avec BCrypt
                         .phoneNumber("+237600000003")
                         .build();

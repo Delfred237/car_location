@@ -21,6 +21,5 @@ public class UserResponseDTO {
     private PieceType pieceType;
     private String pieceNumber;
     private Set<String> roles; // Noms des rôles uniquement
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime createdDate;
 }

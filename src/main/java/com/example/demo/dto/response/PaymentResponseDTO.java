@@ -20,5 +20,5 @@ public class PaymentResponseDTO {
     private String paymentMethod;
     private String transactionId;
     private Long reservationId;
-    private LocalDateTime createdAt;
+    private LocalDateTime createdDate;
 }
