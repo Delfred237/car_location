@@ -1,6 +1,7 @@
 package com.example.demo.services.impl;
 
 import com.example.demo.Repository.AgencyRepository;
+import com.example.demo.dto.pageable.AgencyPageResponse;
 import com.example.demo.dto.request.AgencyRequestDTO;
 import com.example.demo.dto.response.AgencyResponseDTO;
 import com.example.demo.entites.Agency;
@@ -10,6 +11,10 @@ import com.example.demo.mapper.AgencyMapper;
 import com.example.demo.services.AgencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,13 +50,41 @@ public class AgencyServiceImpl implements AgencyService {
     }
 
     @Override
-    public List<AgencyResponseDTO> getAll() {
+    public AgencyPageResponse getAll(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection) {
         log.info("Récupération de toutes les agences");
 
-        return agencyRepository.findAll().stream()
+        Sort sort = sortDirection.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Agency> agencyPage = agencyRepository.findAll(pageable);
+
+        List<AgencyResponseDTO> agencies =  agencyPage.getContent()
+                .stream()
                 .map(agencyMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
+        if (agencies.isEmpty())
+            throw new ResourceNotFoundException("No agencies found");
+
+        return AgencyPageResponse.builder()
+                .content(agencies)
+                .pageNumber(agencyPage.getNumber())
+                .totalPages(agencyPage.getTotalPages())
+                .totalElements(agencyPage.getTotalElements())
+                .pageSize(pageSize)
+                .lastPage(agencyPage.isLast())
+                .build();
     }
+
+//    @Override
+//    public List<AgencyResponseDTO> getAll() {
+//        log.info("Récupération de toutes les agences");
+//
+//        return agencyRepository.findAll().stream()
+//                .map(agencyMapper::toDto)
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public Optional<AgencyResponseDTO> getById(Long id) {

@@ -1,5 +1,7 @@
 package com.example.demo.controllers;
 
+import com.example.demo.config.AppConstants;
+import com.example.demo.dto.pageable.AgencyPageResponse;
 import com.example.demo.dto.request.AgencyRequestDTO;
 import com.example.demo.dto.response.AgencyResponseDTO;
 import com.example.demo.services.AgencyService;
@@ -38,10 +40,20 @@ public class AgencyController {
      * GET /api/agencies
      */
     @GetMapping
-    public ResponseEntity<List<AgencyResponseDTO>> getAllAgencies() {
+    public ResponseEntity<AgencyPageResponse> getAllAgencies(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_CATEGORIES_BY, required = false) String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIRECTION, required = false) String sortDirection
+    ) {
         log.info("GET /api/agencies - Récupération de toutes les agences");
-        return ResponseEntity.status(HttpStatus.OK).body(agencyService.getAll());
+        return ResponseEntity.status(HttpStatus.OK).body(agencyService.getAll(pageNumber,  pageSize, sortBy, sortDirection));
     }
+//    @GetMapping
+//    public ResponseEntity<List<AgencyResponseDTO>> getAllAgencies() {
+//        log.info("GET /api/agencies - Récupération de toutes les agences");
+//        return ResponseEntity.status(HttpStatus.OK).body(agencyService.getAll());
+//    }
 
     /**
      * Rechercher une agence par id

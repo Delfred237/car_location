@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.pageable.AgencyPageResponse;
 import com.example.demo.dto.request.AgencyRequestDTO;
 import com.example.demo.dto.response.AgencyResponseDTO;
 
@@ -10,7 +11,8 @@ public interface AgencyService {
 
     AgencyResponseDTO createAgency(AgencyRequestDTO agencyRequestDTO);
 
-    List<AgencyResponseDTO> getAll();
+//    List<AgencyResponseDTO> getAll();
+AgencyPageResponse getAll(Integer pageNumber, Integer pageSize, String sortBy, String sortDirection);
 
     Optional<AgencyResponseDTO> getById(Long id);
 
