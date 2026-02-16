@@ -46,16 +46,16 @@ app:
     url: http://localhost:8000/api
 
 # STRIPE KEY
-stripe:
-  secret:
-    key: sk_test_51StzLk9WeRiznAYkbSHChPpWKeAJ9cVrh2mdGlHvsgtxzmXmF6fRs2BjTqMYEqGxqrRMJ4j9dJN8PHV6kTrcNkXl0094lpUYcA
-    mode: test
-  webhook:
-    secret: whsec_44ba59e314f0bf9caaa92c0b2020fa346c158158ac0b84fa2ebc4a90a4e6aa40
-  success:
-    url: http://localhost:8000/api/stripe/success
-  cancel:
-    url: http://localhost:8000/api/stripe/cancel
+#stripe:
+#  secret:
+#    key: sk_test_51StzLk9WeRiznAYkbSHChPpWKeAJ9cVrh2mdGlHvsgtxzmXmF6fRs2BjTqMYEqGxqrRMJ4j9dJN8PHV6kTrcNkXl0094lpUYcA
+#    mode: test
+#  webhook:
+#    secret: whsec_44ba59e314f0bf9caaa92c0b2020fa346c158158ac0b84fa2ebc4a90a4e6aa40
+#  success:
+#    url: http://localhost:8000/api/stripe/success
+#  cancel:
+#    url: http://localhost:8000/api/stripe/cancel
 
 # Configuration du serveur
 server:
