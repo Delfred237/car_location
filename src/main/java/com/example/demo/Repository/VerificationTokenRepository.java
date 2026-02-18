@@ -2,6 +2,7 @@ package com.example.demo.Repository;
 
 import com.example.demo.entites.User;
 import com.example.demo.entites.VerificationToken;
+import com.example.demo.enums.TokenType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,7 @@ public interface VerificationTokenRepository extends JpaRepository<VerificationT
 
     Optional<VerificationToken> findByUserAndTokenTypeAndUsedFalse(
             User user,
-            VerificationToken verificationToken
+            TokenType tokenType
     );
 
     void deleteByUser(User user);
