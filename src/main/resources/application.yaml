@@ -2,14 +2,14 @@ spring:
   application:
     name: location_car
 
-  # Configuration de la base de donnees
+  # ========== Configuration de la base de donnees ==========
   datasource:
     url: jdbc:postgresql://localhost:5432/car_location
     username: postgres
     password: postgresql
     driver-class-name: org.postgresql.Driver
 
-  # Configuration de JPA/Hibernate
+  # ========== Configuration de JPA/Hibernate ==========
   jpa:
     show-sql: false
     hibernate:
@@ -20,7 +20,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
 
-  # Configuration Email
+  # ========== Configuration Email ==========
   mail:
     host: smtp.gmail.com
     port: 587
@@ -37,7 +37,7 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-# Email de l'expediteur
+# ========== Email de l'expediteur ==========
 app:
   mail:
     from: carrental@gmail.com
@@ -45,7 +45,7 @@ app:
   base:
     url: http://localhost:8000/api
 
-# STRIPE KEY
+# ========== STRIPE KEY ==========
 stripe:
   secret:
     key: sk_test_51StzLk9WeRiznAYkbSHChPpWKeAJ9cVrh2mdGlHvsgtxzmXmF6fRs2BjTqMYEqGxqrRMJ4j9dJN8PHV6kTrcNkXl0094lpUYcA
@@ -57,13 +57,44 @@ stripe:
   cancel:
     url: http://localhost:8000/api/stripe/cancel
 
-# Configuration du serveur
+# ========== Configuration JWT ==========
+jwt:
+  secret: uJ8xCu0MqGtLfN4hcBRdN7BKxMUWfbMyR7g3e9HClFY
+  access-token:
+    expiration: 900000  # 15 minutes en millisecondes (900000 ms)
+  refresh-token:
+    expiration: 604800000   # 7 jours en millisecondes (604800000 ms)
+
+# ========== Configuration Cookies ==========
+cookie:
+  access-token:
+    name: access_token
+  refresh-token:
+    name: refresh_token
+  domain: localhost
+  secure: false   # Mettre à true en production (HTTPS)
+  same-site: Lax
+
+# ========== Configuration OTP ==========
+otp:
+  expiration: 600000    # 10 minutes en millisecondes
+  length: 6
+  max-attemps: 3
+
+# ========== Configuration Rate Limiting ==========
+rate:
+  limit:
+    login:
+      max-attempts: 5
+      duration: 900000    # 15 minutes
+
+# ========== Configuration du serveur ==========
 server:
   servlet:
     context-path: /api
   port: 8000
 
-# Logs
+# ========== Logs ==========
 logging:
   level:
     org:
