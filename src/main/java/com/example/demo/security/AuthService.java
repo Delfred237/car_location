@@ -17,7 +17,7 @@ public interface AuthService {
 
     void requestPasswordReset(PasswordResetRequestDTO requestDTO);
 
-    void requestPassword(PasswordResetConfirmDTO requestDTO);
+    void resetPassword(PasswordResetConfirmDTO requestDTO);
 
     AuthResponseDTO refreshAccessToken(HttpServletRequest request, HttpServletResponse response);
 

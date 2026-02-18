@@ -287,7 +287,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void requestPassword(PasswordResetConfirmDTO requestDTO) {
+    public void resetPassword(PasswordResetConfirmDTO requestDTO) {
         log.info("Réinitialisation du mot de passe pour : {}", requestDTO.getEmail());
 
         // Valider l'OTP
