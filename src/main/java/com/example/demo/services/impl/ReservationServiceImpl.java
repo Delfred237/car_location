@@ -79,7 +79,7 @@ public class ReservationServiceImpl implements ReservationService {
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        // Envoie de l'eamil de confirmation
+        // Envoie de l'email de confirmation
         emailService.sendReservationConfirmation(savedReservation);
 
         log.info("Réservation créée avec succès : ID {}", savedReservation.getId());

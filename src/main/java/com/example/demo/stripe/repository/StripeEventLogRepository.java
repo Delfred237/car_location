@@ -1,4 +1,4 @@
-package com.example.demo.Repository;
+package com.example.demo.stripe.repository;
 
 import com.example.demo.entites.StripeEventLog;
 import org.springframework.data.jpa.repository.JpaRepository;

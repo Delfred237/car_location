@@ -2,7 +2,7 @@ package com.example.demo.stripe.service;
 
 import com.example.demo.Repository.PaymentRepository;
 import com.example.demo.Repository.ReservationRepository;
-import com.example.demo.Repository.StripeEventLogRepository;
+import com.example.demo.stripe.repository.StripeEventLogRepository;
 import com.example.demo.email.EmailService;
 import com.example.demo.entites.Payment;
 import com.example.demo.entites.Reservation;
@@ -20,7 +20,6 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.model.Refund;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.PaymentIntentCancelParams;
-import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.RefundCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
@@ -112,7 +111,7 @@ public class StripePaymentServiceImpl implements StripePaymentService {
                     .paymentMethod("STRIPE")
                     .paymentDate(LocalDateTime.now())
                     .status(PaymentStatus.PENDING)
-                    .transactionId(session.getId())
+                    .transactionId(session.getPaymentIntent())
                     .build();
             paymentRepository.save(payment);
 
@@ -245,8 +244,13 @@ public class StripePaymentServiceImpl implements StripePaymentService {
             }
         }
 
-        // Envoie de l'email de confirmation
-        emailService.sendPaymentConfirmation(reservation, session.getPaymentIntent());
+        // ✅ ENVOYER L'EMAIL DE CONFIRMATION (seulement si le paiement est COMPLETED)
+        try {
+            emailService.sendPaymentConfirmation(reservation, session.getPaymentIntent());
+            log.info("Email de confirmation envoyé pour la réservation ID {}", reservationId);
+        } catch (Exception e) {
+            log.error("Erreur lors de l'envoi de l'email de confirmation : {}", e.getMessage(), e);
+        }
 
         log.info("Paiement Stripe traité avec succès pour la réservation ID : {}", reservationId);
     }
