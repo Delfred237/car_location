@@ -1,4 +1,4 @@
-package com.example.demo.stripe.dto;
+package com.example.demo.stripe;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

@@ -1,4 +1,4 @@
-package com.example.demo.stripe.dto;
+package com.example.demo.stripe;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

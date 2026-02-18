@@ -1,8 +1,7 @@
-package com.example.demo.stripe.service;
+package com.example.demo.stripe;
 
 import com.example.demo.Repository.PaymentRepository;
 import com.example.demo.Repository.ReservationRepository;
-import com.example.demo.stripe.repository.StripeEventLogRepository;
 import com.example.demo.email.EmailService;
 import com.example.demo.entites.Payment;
 import com.example.demo.entites.Reservation;
@@ -11,8 +10,6 @@ import com.example.demo.enums.PaymentStatus;
 import com.example.demo.enums.ReservationStatus;
 import com.example.demo.exceptions.BusinessException;
 import com.example.demo.exceptions.ResourceNotFoundException;
-import com.example.demo.stripe.dto.StripePaymentRequestDTO;
-import com.example.demo.stripe.dto.StripePaymentResponseDTO;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Charge;
 import com.stripe.model.Event;

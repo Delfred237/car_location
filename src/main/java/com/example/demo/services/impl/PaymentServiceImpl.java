@@ -13,7 +13,7 @@ import com.example.demo.exceptions.BusinessException;
 import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.mapper.PaymentMapper;
 import com.example.demo.services.PaymentService;
-import com.example.demo.stripe.service.StripePaymentService;
+import com.example.demo.stripe.StripePaymentService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j

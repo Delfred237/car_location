@@ -1,7 +1,5 @@
-package com.example.demo.stripe.service;
+package com.example.demo.stripe;
 
-import com.example.demo.stripe.dto.StripePaymentRequestDTO;
-import com.example.demo.stripe.dto.StripePaymentResponseDTO;
 import com.stripe.model.Event;
 
 import java.math.BigDecimal;

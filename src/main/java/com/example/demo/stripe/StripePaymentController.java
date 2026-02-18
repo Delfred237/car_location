@@ -1,8 +1,5 @@
-package com.example.demo.stripe.controller;
+package com.example.demo.stripe;
 
-import com.example.demo.stripe.dto.StripePaymentRequestDTO;
-import com.example.demo.stripe.dto.StripePaymentResponseDTO;
-import com.example.demo.stripe.service.StripePaymentService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.net.Webhook;
