@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -17,6 +18,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Configuration
 public class DataInitializer {
+
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     CommandLineRunner initDatabase(
@@ -62,7 +65,7 @@ public class DataInitializer {
                 User admin = User.builder()
                         .fullName("Admin System")
                         .email("admin@carrental.com")
-                        .password("Admin@123") // TODO: Hacher avec BCrypt
+                        .password(passwordEncoder.encode("Admin@123"))
                         .phoneNumber("+237600000001")
                         .accountNonLocked(true)
                         .accountNonExpired(true)
@@ -78,7 +81,7 @@ public class DataInitializer {
                 User client1 = User.builder()
                         .fullName("Fossi Delfred")
                         .email("tenedelfred19@gmail.com")
-                        .password("Client@123") // TODO: Hacher avec BCrypt
+                        .password(passwordEncoder.encode("Client@123"))
                         .phoneNumber("+237600000002")
                         .accountNonLocked(true)
                         .accountNonExpired(true)
@@ -93,7 +96,7 @@ public class DataInitializer {
                 User client2 = User.builder()
                         .fullName("Tamo Prisca")
                         .email("tamoprisca6@gmail.com")
-                        .password("Client@123") // TODO: Hacher avec BCrypt
+                        .password(passwordEncoder.encode("Client@123"))
                         .phoneNumber("+237600000003")
                         .accountNonLocked(true)
                         .accountNonExpired(true)

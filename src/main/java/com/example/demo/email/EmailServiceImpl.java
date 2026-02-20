@@ -188,12 +188,10 @@ public class EmailServiceImpl implements EmailService{
     public void sendAccountVerification(User user, String verificationToken) {
         log.info("Envoi de l'email de vérification de compte à : {}", user.getEmail());
 
-        String verificationUrl = baseUrl + "/api/auth/verify?token=" + verificationToken;
-
         Map<String, Object> model = new HashMap<>();
         model.put("userName", user.getFullName());
-        model.put("verificationUrl", verificationUrl);
-        model.put("expirationTime", "24 heures");
+        model.put("verificationCode", verificationToken);
+        model.put("expirationTime", "10 minutes");
 
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(user.getEmail())
@@ -209,12 +207,10 @@ public class EmailServiceImpl implements EmailService{
     public void sendPasswordResetEmail(User user, String resetToken) {
         log.info("Envoi de l'email de réinitialisation de mot de passe à : {}", user.getEmail());
 
-        String resetUrl = baseUrl + "/api/auth/reset-password?token=" + resetToken;
-
         Map<String, Object> model = new HashMap<>();
         model.put("userName", user.getFullName());
-        model.put("resetUrl", resetUrl);
-        model.put("expirationTime", "1 heure");
+        model.put("resetCode", resetToken);
+        model.put("expirationTime", "10 minutes");
 
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(user.getEmail())
@@ -232,7 +228,7 @@ public class EmailServiceImpl implements EmailService{
 
         Map<String, Object> model = new HashMap<>();
         model.put("userName", user.getFullName());
-        model.put("loginUrl", baseUrl + "/login");
+        model.put("loginUrl", baseUrl + "/api/login");
 
         EmailDetailsDTO emailDetails = EmailDetailsDTO.builder()
                 .recipient(user.getEmail())
