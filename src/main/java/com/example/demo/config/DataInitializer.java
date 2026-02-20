@@ -64,6 +64,9 @@ public class DataInitializer {
                         .email("admin@carrental.com")
                         .password("Admin@123") // TODO: Hacher avec BCrypt
                         .phoneNumber("+237600000001")
+                        .accountNonLocked(true)
+                        .accountNonExpired(true)
+                        .enabled(true)
                         .build();
                 Set<Role> adminRoles = new HashSet<>();
                 adminRoles.add(roleAdmin);
@@ -77,6 +80,9 @@ public class DataInitializer {
                         .email("tenedelfred19@gmail.com")
                         .password("Client@123") // TODO: Hacher avec BCrypt
                         .phoneNumber("+237600000002")
+                        .accountNonLocked(true)
+                        .accountNonExpired(true)
+                        .enabled(true)
                         .build();
                 Set<Role> client1Roles = new HashSet<>();
                 client1Roles.add(roleClient);
@@ -89,6 +95,9 @@ public class DataInitializer {
                         .email("tamoprisca6@gmail.com")
                         .password("Client@123") // TODO: Hacher avec BCrypt
                         .phoneNumber("+237600000003")
+                        .accountNonLocked(true)
+                        .accountNonExpired(true)
+                        .enabled(true)
                         .build();
                 Set<Role> client2Roles = new HashSet<>();
                 client2Roles.add(roleClient);

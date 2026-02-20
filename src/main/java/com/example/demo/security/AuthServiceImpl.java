@@ -48,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private OtpService otpService;
+    private final OtpService otpService;
     private final RefreshTokenService refreshTokenService;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
