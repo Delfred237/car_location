@@ -16,6 +16,8 @@ public class AuthResponseDTO {
     private Long userId;
     private String email;
     private String fullName;
+    private String accessToken;
+    private String refreshToken;
     private Set<String> roles;
     private String message;
     private boolean accountVerified;

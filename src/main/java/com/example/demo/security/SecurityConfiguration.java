@@ -3,6 +3,7 @@ package com.example.demo.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -43,6 +44,38 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         // Endpoints publics (authentification)
                         .requestMatchers("/auth/**").permitAll()
+
+                        // Webhooks Stripe (public)
+                        .requestMatchers("/stripe/webhook").permitAll()
+
+                        // Endpoints publics (consultation)
+                        .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/agencies/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/cars/**").permitAll()
+
+                        // Endpoints protégés - ADMIN uniquement
+                        .requestMatchers(HttpMethod.POST, "/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/categories/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/agencies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/agencies/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/agencies/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/cars/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/cars/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/cars/**").hasRole("ADMIN")
+
+                        // Gestion des utilisateurs - ADMIN uniquement
+                        .requestMatchers("/users/*/roles/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+
+                        // Endpoints protégés - Utilisateurs authentifiés
+                        .requestMatchers("/reservations/**").authenticated()
+                        .requestMatchers("/payments/**").authenticated()
+                        .requestMatchers("/stripe/**").authenticated()
+                        .requestMatchers("/users/**").authenticated()
 
                         // Tout le reste nécessite une authentification
                         .anyRequest().authenticated()

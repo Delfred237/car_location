@@ -76,7 +76,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO register(RegisterRequestDTO requestDTO) {
-        log.info("Inscription d'un nouvel utilisateur : {}", requestDTO.getEmail());
 
         // Verifier si l'email existe deja
         if (userRepository.existsByEmail(requestDTO.getEmail())) {
@@ -191,6 +190,8 @@ public class AuthServiceImpl implements AuthService {
                 .userId(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
                 .roles(user.getRoles().stream()
                         .map(role -> role.getName().name())
                         .collect(Collectors.toSet()))
